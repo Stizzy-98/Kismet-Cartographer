@@ -20,7 +20,7 @@ You need Elasticsearch and Kibana **8.x or 9.x** (developed and tested on 9.4) a
 ### 1. Create an API key
 
 Create a API key with these permissions:
-
+```
 {
   "kismet-cartographer-ingest": {
     "cluster": [],
@@ -48,6 +48,7 @@ Create a API key with these permissions:
     }
   }
 }
+```
 
 The key can belong to **any account**: `elastic`, your own user, or a service account. The installer never asks whose key it is;
 Elasticsearch works that out from the key. The only requirement is that the account creating it holds those rights itself
