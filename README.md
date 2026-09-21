@@ -1,7 +1,7 @@
 # Kismet Cartographer
 
-Load [Kismet](https://www.kismetwireless.net/) wardriving captures (`*.kismet` files) into **Elasticsearch** and explore them
-in **Kibana**: a map of where you captured, plus dashboards that show which brands, models and security versions of Wi-Fi
+A painless process to load [Kismet](https://www.kismetwireless.net/) wardriving captures (`*.kismet` files) into **Elasticsearch** and explore them
+in **Kibana**: a map of where you captured data, plus dashboards that show which brands, models and security versions of Wi-Fi
 devices were around you.
 
 * One command installs everything into your Elastic Stack - standard install, Kubernetes (ECK) or Elastic Cloud.
@@ -19,15 +19,35 @@ You need Elasticsearch and Kibana **8.x or 9.x** (developed and tested on 9.4) a
 
 ### 1. Create an API key
 
-In Kibana open **Dev Tools -> Console**, paste the output of
+Create a API key with these permissions:
 
-```bash
-./install --print-api-key-request
-```
-
-and run it. Copy the `encoded` value from the answer into a file, for example `~/kc.key` (`chmod 600 ~/kc.key`). Elasticsearch shows it only once.
-The key gets exactly the rights the installer needs, limited to `kismet-cartographer-*` indices and one Kibana space.
-(Using a Kibana space other than `default`? Add `--space <id>` to that command.)
+{
+  "kismet-cartographer-ingest": {
+    "cluster": [],
+    "indices": [
+      {
+        "names": [
+          "kismet-cartographer-*"
+        ],
+        "privileges": [
+          "create_index",
+          "create_doc",
+          "index",
+          "write",
+          "read",
+          "view_index_metadata"
+        ],
+        "allow_restricted_indices": false
+      }
+    ],
+    "applications": [],
+    "run_as": [],
+    "metadata": {},
+    "transient_metadata": {
+      "enabled": true
+    }
+  }
+}
 
 The key can belong to **any account**: `elastic`, your own user, or a service account. The installer never asks whose key it is;
 Elasticsearch works that out from the key. The only requirement is that the account creating it holds those rights itself
