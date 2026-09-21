@@ -1,0 +1,128 @@
+{
+  "id": "kismet-cartographer-lens-hw-model-treemap",
+  "type": "lens",
+  "attributes": {
+    "title": "Kismet Cartographer - Model - brand to model",
+    "description": "Models that identified themselves (WPS model name), grouped by brand. Area = number of devices.",
+    "visualizationType": "lnsPie",
+    "state": {
+      "datasourceStates": {
+        "formBased": {
+          "layers": {
+            "layer1": {
+              "columnOrder": [
+                "brand",
+                "model",
+                "metric"
+              ],
+              "columns": {
+                "metric": {
+                  "label": "Devices",
+                  "customLabel": true,
+                  "dataType": "number",
+                  "operationType": "count",
+                  "isBucketed": false,
+                  "scale": "ratio",
+                  "sourceField": "___records___",
+                  "params": {
+                    "emptyAsNull": false
+                  }
+                },
+                "brand": {
+                  "label": "Brand",
+                  "customLabel": true,
+                  "dataType": "string",
+                  "operationType": "terms",
+                  "scale": "ordinal",
+                  "sourceField": "device.manufacturer",
+                  "isBucketed": true,
+                  "params": {
+                    "size": 10,
+                    "orderBy": {
+                      "type": "column",
+                      "columnId": "metric"
+                    },
+                    "orderDirection": "desc",
+                    "otherBucket": false,
+                    "missingBucket": false,
+                    "parentFormat": {
+                      "id": "terms"
+                    },
+                    "include": [],
+                    "exclude": [],
+                    "includeIsRegex": false,
+                    "excludeIsRegex": false
+                  }
+                },
+                "model": {
+                  "label": "Model",
+                  "customLabel": true,
+                  "dataType": "string",
+                  "operationType": "terms",
+                  "scale": "ordinal",
+                  "sourceField": "device.model.name",
+                  "isBucketed": true,
+                  "params": {
+                    "size": 6,
+                    "orderBy": {
+                      "type": "column",
+                      "columnId": "metric"
+                    },
+                    "orderDirection": "desc",
+                    "otherBucket": false,
+                    "missingBucket": false,
+                    "parentFormat": {
+                      "id": "terms"
+                    },
+                    "include": [],
+                    "exclude": [],
+                    "includeIsRegex": false,
+                    "excludeIsRegex": false
+                  }
+                }
+              },
+              "incompleteColumns": {},
+              "sampling": 1
+            }
+          }
+        }
+      },
+      "filters": [],
+      "query": {
+        "query": "kismet.record : \"device\" and kismet.phy : \"IEEE802.11\" and device.model.name : *",
+        "language": "kuery"
+      },
+      "visualization": {
+        "shape": "treemap",
+        "layers": [
+          {
+            "layerId": "layer1",
+            "primaryGroups": [
+              "brand",
+              "model"
+            ],
+            "metrics": [
+              "metric"
+            ],
+            "numberDisplay": "value",
+            "categoryDisplay": "default",
+            "legendDisplay": "hide",
+            "legendPosition": "right",
+            "nestedLegend": false,
+            "layerType": "data",
+            "colorMapping": null
+          }
+        ]
+      },
+      "adHocDataViews": {},
+      "internalReferences": []
+    }
+  },
+  "references": [
+    {
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview",
+      "name": "indexpattern-datasource-layer-layer1"
+    }
+  ]
+}

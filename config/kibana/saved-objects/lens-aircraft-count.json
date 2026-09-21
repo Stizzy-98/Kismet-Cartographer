@@ -1,0 +1,60 @@
+{
+  "id": "kismet-cartographer-lens-aircraft-count",
+  "type": "lens",
+  "attributes": {
+    "title": "Kismet Cartographer - Aircraft seen",
+    "description": "Distinct aircraft.icao over ADS-B frames and aircraft device records.",
+    "visualizationType": "lnsMetric",
+    "state": {
+      "datasourceStates": {
+        "formBased": {
+          "layers": {
+            "layer1": {
+              "columnOrder": [
+                "metric"
+              ],
+              "columns": {
+                "metric": {
+                  "label": "Aircraft",
+                  "customLabel": true,
+                  "dataType": "number",
+                  "operationType": "unique_count",
+                  "isBucketed": false,
+                  "scale": "ratio",
+                  "sourceField": "aircraft.icao",
+                  "params": {
+                    "emptyAsNull": false
+                  }
+                }
+              },
+              "incompleteColumns": {},
+              "sampling": 1
+            }
+          }
+        }
+      },
+      "filters": [],
+      "query": {
+        "query": "kismet.phy : \"ADSB\"",
+        "language": "kuery"
+      },
+      "visualization": {
+        "layerId": "layer1",
+        "layerType": "data",
+        "metricAccessor": "metric",
+        "color": "#F1F4FA",
+        "showBar": false,
+        "subtitle": "distinct aircraft.icao"
+      },
+      "adHocDataViews": {},
+      "internalReferences": []
+    }
+  },
+  "references": [
+    {
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview",
+      "name": "indexpattern-datasource-layer-layer1"
+    }
+  ]
+}

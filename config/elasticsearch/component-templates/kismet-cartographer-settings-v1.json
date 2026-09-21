@@ -1,0 +1,20 @@
+{
+  "template": {
+    "settings": {
+      "index": {
+        "number_of_shards": 1,
+        "number_of_replicas": 0,
+        "codec": "best_compression",
+        "refresh_interval": "30s",
+        "default_pipeline": "kismet-cartographer-normalize-v1"
+      }
+    }
+  },
+  "version": 1,
+  "_meta": {
+    "project": "kismet-cartographer",
+    "managed_by": "kismet-cartographer installer",
+    "docs": "docs/data-model.md",
+    "description": "Shared index settings. 1 primary, 0 replicas: this project must stay small on a shard-constrained single-node cluster; raise with install --replicas N on multi-node clusters."
+  }
+}

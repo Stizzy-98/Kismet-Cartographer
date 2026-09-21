@@ -1,0 +1,60 @@
+{
+  "id": "kismet-cartographer-lens-total-observations",
+  "type": "lens",
+  "attributes": {
+    "title": "Kismet Cartographer - Total observations",
+    "description": "Wi-Fi packets + ADS-B frames (kismet.record: wifi.packet or adsb.frame).",
+    "visualizationType": "lnsMetric",
+    "state": {
+      "datasourceStates": {
+        "formBased": {
+          "layers": {
+            "layer1": {
+              "columnOrder": [
+                "metric"
+              ],
+              "columns": {
+                "metric": {
+                  "label": "Observations",
+                  "customLabel": true,
+                  "dataType": "number",
+                  "operationType": "count",
+                  "isBucketed": false,
+                  "scale": "ratio",
+                  "sourceField": "___records___",
+                  "params": {
+                    "emptyAsNull": false
+                  }
+                }
+              },
+              "incompleteColumns": {},
+              "sampling": 1
+            }
+          }
+        }
+      },
+      "filters": [],
+      "query": {
+        "query": "kismet.record : (\"wifi.packet\" or \"adsb.frame\")",
+        "language": "kuery"
+      },
+      "visualization": {
+        "layerId": "layer1",
+        "layerType": "data",
+        "metricAccessor": "metric",
+        "color": "#F1F4FA",
+        "showBar": false,
+        "subtitle": "wifi.packet + adsb.frame"
+      },
+      "adHocDataViews": {},
+      "internalReferences": []
+    }
+  },
+  "references": [
+    {
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview",
+      "name": "indexpattern-datasource-layer-layer1"
+    }
+  ]
+}

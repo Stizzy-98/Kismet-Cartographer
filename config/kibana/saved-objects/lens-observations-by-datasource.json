@@ -1,0 +1,117 @@
+{
+  "id": "kismet-cartographer-lens-observations-by-datasource",
+  "type": "lens",
+  "attributes": {
+    "title": "Kismet Cartographer - Observations by datasource",
+    "description": "Wi-Fi packets + ADS-B frames per kismet.datasource.name.",
+    "visualizationType": "lnsXY",
+    "state": {
+      "datasourceStates": {
+        "formBased": {
+          "layers": {
+            "layer1": {
+              "columnOrder": [
+                "bucket",
+                "metric"
+              ],
+              "columns": {
+                "metric": {
+                  "label": "Observations",
+                  "customLabel": true,
+                  "dataType": "number",
+                  "operationType": "count",
+                  "isBucketed": false,
+                  "scale": "ratio",
+                  "sourceField": "___records___",
+                  "params": {
+                    "emptyAsNull": false
+                  }
+                },
+                "bucket": {
+                  "label": "Datasource",
+                  "customLabel": true,
+                  "dataType": "string",
+                  "operationType": "terms",
+                  "scale": "ordinal",
+                  "sourceField": "kismet.datasource.name",
+                  "isBucketed": true,
+                  "params": {
+                    "size": 10,
+                    "orderBy": {
+                      "type": "column",
+                      "columnId": "metric"
+                    },
+                    "orderDirection": "desc",
+                    "otherBucket": true,
+                    "missingBucket": false,
+                    "parentFormat": {
+                      "id": "terms"
+                    },
+                    "include": [],
+                    "exclude": [],
+                    "includeIsRegex": false,
+                    "excludeIsRegex": false
+                  }
+                }
+              },
+              "incompleteColumns": {},
+              "sampling": 1
+            }
+          }
+        }
+      },
+      "filters": [],
+      "query": {
+        "query": "kismet.record : (\"wifi.packet\" or \"adsb.frame\")",
+        "language": "kuery"
+      },
+      "visualization": {
+        "legend": {
+          "isVisible": false,
+          "position": "right"
+        },
+        "valueLabels": "hide",
+        "fittingFunction": "None",
+        "axisTitlesVisibilitySettings": {
+          "x": false,
+          "yLeft": true,
+          "yRight": true
+        },
+        "tickLabelsVisibilitySettings": {
+          "x": true,
+          "yLeft": true,
+          "yRight": true
+        },
+        "gridlinesVisibilitySettings": {
+          "x": false,
+          "yLeft": true,
+          "yRight": true
+        },
+        "preferredSeriesType": "bar_horizontal",
+        "layers": [
+          {
+            "layerId": "layer1",
+            "accessors": [
+              "metric"
+            ],
+            "position": "top",
+            "seriesType": "bar_horizontal",
+            "showGridlines": false,
+            "layerType": "data",
+            "xAccessor": "bucket",
+            "colorMapping": null
+          }
+        ]
+      },
+      "adHocDataViews": {},
+      "internalReferences": []
+    }
+  },
+  "references": [
+    {
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview",
+      "name": "indexpattern-datasource-layer-layer1"
+    }
+  ]
+}

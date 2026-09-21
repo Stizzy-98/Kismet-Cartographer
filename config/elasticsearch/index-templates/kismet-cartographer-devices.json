@@ -1,0 +1,18 @@
+{
+  "index_patterns": [
+    "kismet-cartographer-devices-*"
+  ],
+  "priority": 500,
+  "composed_of": [
+    "kismet-cartographer-settings-v1",
+    "kismet-cartographer-mappings-common-v1"
+  ],
+  "version": 1,
+  "_meta": {
+    "project": "kismet-cartographer",
+    "managed_by": "kismet-cartographer installer",
+    "docs": "docs/data-model.md",
+    "family": "devices",
+    "description": "Device inventory per capture file: Wi-Fi devices and aircraft, with the original Kismet device JSON in kismet.raw."
+  }
+}

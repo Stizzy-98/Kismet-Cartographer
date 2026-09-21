@@ -1,0 +1,24 @@
+# Secrets and environment-specific files - never commit
+.env
+*.env
+!.env.example
+*.pem
+*.key
+*.crt
+
+# Capture data (real GPS/SSID data) and generated output. The wardrives/ folder itself is kept (see its README).
+wardrives/*
+!wardrives/README.md
+*.kismet
+!tests/data/synthetic*.kismet
+out/
+state/
+exports/
+
+# Python / editors / OS
+__pycache__/
+*.pyc
+.venv/
+.idea/
+.vscode/
+.DS_Store

@@ -1,0 +1,621 @@
+{
+  "id": "kismet-cartographer-overview",
+  "type": "dashboard",
+  "attributes": {
+    "title": "Kismet Cartographer - Overview",
+    "description": "Wi-Fi and ADS-B captures from KismetDB. Map positions: observer = collector position, observer_centroid = average collector position for a device, emitter_reported = the aircraft's own ADS-B position.",
+    "panelsJSON": [
+      {
+        "version": "9.4.2",
+        "type": "lens",
+        "panelIndex": "1",
+        "gridData": {
+          "x": 0,
+          "y": 0,
+          "w": 10,
+          "h": 6,
+          "i": "1"
+        },
+        "embeddableConfig": {
+          "enhancements": {}
+        },
+        "panelRefName": "panel_1"
+      },
+      {
+        "version": "9.4.2",
+        "type": "lens",
+        "panelIndex": "2",
+        "gridData": {
+          "x": 10,
+          "y": 0,
+          "w": 10,
+          "h": 6,
+          "i": "2"
+        },
+        "embeddableConfig": {
+          "enhancements": {}
+        },
+        "panelRefName": "panel_2"
+      },
+      {
+        "version": "9.4.2",
+        "type": "lens",
+        "panelIndex": "3",
+        "gridData": {
+          "x": 20,
+          "y": 0,
+          "w": 10,
+          "h": 6,
+          "i": "3"
+        },
+        "embeddableConfig": {
+          "enhancements": {}
+        },
+        "panelRefName": "panel_3"
+      },
+      {
+        "version": "9.4.2",
+        "type": "lens",
+        "panelIndex": "4",
+        "gridData": {
+          "x": 30,
+          "y": 0,
+          "w": 9,
+          "h": 6,
+          "i": "4"
+        },
+        "embeddableConfig": {
+          "enhancements": {}
+        },
+        "panelRefName": "panel_4"
+      },
+      {
+        "version": "9.4.2",
+        "type": "lens",
+        "panelIndex": "5",
+        "gridData": {
+          "x": 39,
+          "y": 0,
+          "w": 9,
+          "h": 6,
+          "i": "5"
+        },
+        "embeddableConfig": {
+          "enhancements": {}
+        },
+        "panelRefName": "panel_5"
+      },
+      {
+        "version": "9.4.2",
+        "type": "map",
+        "panelIndex": "6",
+        "gridData": {
+          "x": 0,
+          "y": 6,
+          "w": 48,
+          "h": 38,
+          "i": "6"
+        },
+        "embeddableConfig": {
+          "enhancements": {},
+          "isLayerTOCOpen": false,
+          "openTOCDetails": []
+        },
+        "panelRefName": "panel_6"
+      },
+      {
+        "version": "9.4.2",
+        "type": "lens",
+        "panelIndex": "7",
+        "gridData": {
+          "x": 0,
+          "y": 44,
+          "w": 48,
+          "h": 14,
+          "i": "7"
+        },
+        "embeddableConfig": {
+          "enhancements": {}
+        },
+        "panelRefName": "panel_7"
+      },
+      {
+        "version": "9.4.2",
+        "type": "lens",
+        "panelIndex": "8",
+        "gridData": {
+          "x": 0,
+          "y": 58,
+          "w": 16,
+          "h": 15,
+          "i": "8"
+        },
+        "embeddableConfig": {
+          "enhancements": {}
+        },
+        "panelRefName": "panel_8"
+      },
+      {
+        "version": "9.4.2",
+        "type": "lens",
+        "panelIndex": "9",
+        "gridData": {
+          "x": 16,
+          "y": 58,
+          "w": 16,
+          "h": 15,
+          "i": "9"
+        },
+        "embeddableConfig": {
+          "enhancements": {}
+        },
+        "panelRefName": "panel_9"
+      },
+      {
+        "version": "9.4.2",
+        "type": "lens",
+        "panelIndex": "10",
+        "gridData": {
+          "x": 32,
+          "y": 58,
+          "w": 16,
+          "h": 15,
+          "i": "10"
+        },
+        "embeddableConfig": {
+          "enhancements": {}
+        },
+        "panelRefName": "panel_10"
+      },
+      {
+        "version": "9.4.2",
+        "type": "lens",
+        "panelIndex": "11",
+        "gridData": {
+          "x": 0,
+          "y": 73,
+          "w": 16,
+          "h": 16,
+          "i": "11"
+        },
+        "embeddableConfig": {
+          "enhancements": {}
+        },
+        "panelRefName": "panel_11"
+      },
+      {
+        "version": "9.4.2",
+        "type": "search",
+        "panelIndex": "12",
+        "gridData": {
+          "x": 16,
+          "y": 73,
+          "w": 32,
+          "h": 16,
+          "i": "12"
+        },
+        "embeddableConfig": {
+          "enhancements": {}
+        },
+        "panelRefName": "panel_12"
+      }
+    ],
+    "optionsJSON": {
+      "useMargins": true,
+      "syncColors": false,
+      "syncCursor": true,
+      "syncTooltips": false,
+      "hidePanelTitles": false
+    },
+    "timeRestore": true,
+    "timeFrom": "now-2y",
+    "timeTo": "now",
+    "refreshInterval": {
+      "pause": true,
+      "value": 60000
+    },
+    "controlGroupInput": {
+      "chainingSystem": "HIERARCHICAL",
+      "controlStyle": "oneLine",
+      "labelPosition": "oneLine",
+      "showApplySelections": false,
+      "autoApplySelections": true,
+      "ignoreParentSettingsJSON": {
+        "ignoreFilters": false,
+        "ignoreQuery": false,
+        "ignoreTimerange": false,
+        "ignoreValidations": false
+      },
+      "panelsJSON": {
+        "kismet-cartographer-control-capture-file": {
+          "type": "optionsListControl",
+          "order": 0,
+          "grow": true,
+          "width": "medium",
+          "explicitInput": {
+            "id": "kismet-cartographer-control-capture-file",
+            "fieldName": "kismet.source.file",
+            "title": "Capture file",
+            "grow": true,
+            "width": "medium",
+            "enhancements": {},
+            "searchTechnique": "prefix",
+            "selectedOptions": [],
+            "exclude": false,
+            "existsSelected": false,
+            "sort": {
+              "by": "_count",
+              "direction": "desc"
+            }
+          }
+        },
+        "kismet-cartographer-control-record-type": {
+          "type": "optionsListControl",
+          "order": 1,
+          "grow": true,
+          "width": "medium",
+          "explicitInput": {
+            "id": "kismet-cartographer-control-record-type",
+            "fieldName": "kismet.record",
+            "title": "Record type",
+            "grow": true,
+            "width": "medium",
+            "enhancements": {},
+            "searchTechnique": "prefix",
+            "selectedOptions": [],
+            "exclude": false,
+            "existsSelected": false,
+            "sort": {
+              "by": "_count",
+              "direction": "desc"
+            }
+          }
+        },
+        "kismet-cartographer-control-phy": {
+          "type": "optionsListControl",
+          "order": 2,
+          "grow": true,
+          "width": "small",
+          "explicitInput": {
+            "id": "kismet-cartographer-control-phy",
+            "fieldName": "kismet.phy",
+            "title": "PHY (Wi-Fi / ADS-B)",
+            "grow": true,
+            "width": "small",
+            "enhancements": {},
+            "searchTechnique": "prefix",
+            "selectedOptions": [],
+            "exclude": false,
+            "existsSelected": false,
+            "sort": {
+              "by": "_count",
+              "direction": "desc"
+            }
+          }
+        },
+        "kismet-cartographer-control-datasource": {
+          "type": "optionsListControl",
+          "order": 3,
+          "grow": true,
+          "width": "small",
+          "explicitInput": {
+            "id": "kismet-cartographer-control-datasource",
+            "fieldName": "kismet.datasource.name",
+            "title": "Datasource",
+            "grow": true,
+            "width": "small",
+            "enhancements": {},
+            "searchTechnique": "prefix",
+            "selectedOptions": [],
+            "exclude": false,
+            "existsSelected": false,
+            "sort": {
+              "by": "_count",
+              "direction": "desc"
+            }
+          }
+        },
+        "kismet-cartographer-control-ssid": {
+          "type": "optionsListControl",
+          "order": 4,
+          "grow": true,
+          "width": "medium",
+          "explicitInput": {
+            "id": "kismet-cartographer-control-ssid",
+            "fieldName": "wifi.ssid",
+            "title": "SSID",
+            "grow": true,
+            "width": "medium",
+            "enhancements": {},
+            "searchTechnique": "prefix",
+            "selectedOptions": [],
+            "exclude": false,
+            "existsSelected": false,
+            "sort": {
+              "by": "_count",
+              "direction": "desc"
+            }
+          }
+        },
+        "kismet-cartographer-control-bssid": {
+          "type": "optionsListControl",
+          "order": 5,
+          "grow": true,
+          "width": "medium",
+          "explicitInput": {
+            "id": "kismet-cartographer-control-bssid",
+            "fieldName": "wifi.bssid",
+            "title": "BSSID",
+            "grow": true,
+            "width": "medium",
+            "enhancements": {},
+            "searchTechnique": "prefix",
+            "selectedOptions": [],
+            "exclude": false,
+            "existsSelected": false,
+            "sort": {
+              "by": "_count",
+              "direction": "desc"
+            }
+          }
+        },
+        "kismet-cartographer-control-mac": {
+          "type": "optionsListControl",
+          "order": 6,
+          "grow": true,
+          "width": "medium",
+          "explicitInput": {
+            "id": "kismet-cartographer-control-mac",
+            "fieldName": "wifi.mac",
+            "title": "Device MAC",
+            "grow": true,
+            "width": "medium",
+            "enhancements": {},
+            "searchTechnique": "prefix",
+            "selectedOptions": [],
+            "exclude": false,
+            "existsSelected": false,
+            "sort": {
+              "by": "_count",
+              "direction": "desc"
+            }
+          }
+        },
+        "kismet-cartographer-control-device-key": {
+          "type": "optionsListControl",
+          "order": 7,
+          "grow": true,
+          "width": "medium",
+          "explicitInput": {
+            "id": "kismet-cartographer-control-device-key",
+            "fieldName": "kismet.device_key",
+            "title": "Kismet device key",
+            "grow": true,
+            "width": "medium",
+            "enhancements": {},
+            "searchTechnique": "prefix",
+            "selectedOptions": [],
+            "exclude": false,
+            "existsSelected": false,
+            "sort": {
+              "by": "_count",
+              "direction": "desc"
+            }
+          }
+        },
+        "kismet-cartographer-control-icao": {
+          "type": "optionsListControl",
+          "order": 8,
+          "grow": true,
+          "width": "small",
+          "explicitInput": {
+            "id": "kismet-cartographer-control-icao",
+            "fieldName": "aircraft.icao",
+            "title": "Aircraft ICAO",
+            "grow": true,
+            "width": "small",
+            "enhancements": {},
+            "searchTechnique": "prefix",
+            "selectedOptions": [],
+            "exclude": false,
+            "existsSelected": false,
+            "sort": {
+              "by": "_count",
+              "direction": "desc"
+            }
+          }
+        },
+        "kismet-cartographer-control-band": {
+          "type": "optionsListControl",
+          "order": 9,
+          "grow": true,
+          "width": "small",
+          "explicitInput": {
+            "id": "kismet-cartographer-control-band",
+            "fieldName": "wifi.band",
+            "title": "Band",
+            "grow": true,
+            "width": "small",
+            "enhancements": {},
+            "searchTechnique": "prefix",
+            "selectedOptions": [],
+            "exclude": false,
+            "existsSelected": false,
+            "sort": {
+              "by": "_count",
+              "direction": "desc"
+            }
+          }
+        },
+        "kismet-cartographer-control-channel": {
+          "type": "optionsListControl",
+          "order": 10,
+          "grow": true,
+          "width": "small",
+          "explicitInput": {
+            "id": "kismet-cartographer-control-channel",
+            "fieldName": "wifi.channel",
+            "title": "Channel",
+            "grow": true,
+            "width": "small",
+            "enhancements": {},
+            "searchTechnique": "prefix",
+            "selectedOptions": [],
+            "exclude": false,
+            "existsSelected": false,
+            "sort": {
+              "by": "_count",
+              "direction": "desc"
+            }
+          }
+        },
+        "kismet-cartographer-control-rssi": {
+          "type": "rangeSliderControl",
+          "order": 11,
+          "grow": true,
+          "width": "medium",
+          "explicitInput": {
+            "id": "kismet-cartographer-control-rssi",
+            "fieldName": "wifi.rssi",
+            "title": "Signal strength (dBm)",
+            "grow": true,
+            "width": "medium",
+            "enhancements": {},
+            "step": 1
+          }
+        }
+      }
+    },
+    "kibanaSavedObjectMeta": {
+      "searchSourceJSON": {
+        "query": {
+          "query": "",
+          "language": "kuery"
+        },
+        "filter": []
+      }
+    }
+  },
+  "references": [
+    {
+      "name": "panel_1",
+      "type": "lens",
+      "id": "kismet-cartographer-lens-total-observations"
+    },
+    {
+      "name": "panel_2",
+      "type": "lens",
+      "id": "kismet-cartographer-lens-unique-devices"
+    },
+    {
+      "name": "panel_3",
+      "type": "lens",
+      "id": "kismet-cartographer-lens-unique-bssids"
+    },
+    {
+      "name": "panel_4",
+      "type": "lens",
+      "id": "kismet-cartographer-lens-unique-ssids"
+    },
+    {
+      "name": "panel_5",
+      "type": "lens",
+      "id": "kismet-cartographer-lens-aircraft-count"
+    },
+    {
+      "name": "panel_6",
+      "type": "map",
+      "id": "kismet-cartographer-map"
+    },
+    {
+      "name": "panel_7",
+      "type": "lens",
+      "id": "kismet-cartographer-lens-observations-over-time"
+    },
+    {
+      "name": "panel_8",
+      "type": "lens",
+      "id": "kismet-cartographer-lens-rssi-distribution"
+    },
+    {
+      "name": "panel_9",
+      "type": "lens",
+      "id": "kismet-cartographer-lens-observations-by-datasource"
+    },
+    {
+      "name": "panel_10",
+      "type": "lens",
+      "id": "kismet-cartographer-lens-observations-by-phy"
+    },
+    {
+      "name": "panel_11",
+      "type": "lens",
+      "id": "kismet-cartographer-lens-devices-by-type"
+    },
+    {
+      "name": "panel_12",
+      "type": "search",
+      "id": "kismet-cartographer-recent-observations"
+    },
+    {
+      "name": "controlGroup_kismet-cartographer-control-capture-file:optionsListDataView",
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview"
+    },
+    {
+      "name": "controlGroup_kismet-cartographer-control-record-type:optionsListDataView",
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview"
+    },
+    {
+      "name": "controlGroup_kismet-cartographer-control-phy:optionsListDataView",
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview"
+    },
+    {
+      "name": "controlGroup_kismet-cartographer-control-datasource:optionsListDataView",
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview"
+    },
+    {
+      "name": "controlGroup_kismet-cartographer-control-ssid:optionsListDataView",
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview"
+    },
+    {
+      "name": "controlGroup_kismet-cartographer-control-bssid:optionsListDataView",
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview"
+    },
+    {
+      "name": "controlGroup_kismet-cartographer-control-mac:optionsListDataView",
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview"
+    },
+    {
+      "name": "controlGroup_kismet-cartographer-control-device-key:optionsListDataView",
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview"
+    },
+    {
+      "name": "controlGroup_kismet-cartographer-control-icao:optionsListDataView",
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview"
+    },
+    {
+      "name": "controlGroup_kismet-cartographer-control-band:optionsListDataView",
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview"
+    },
+    {
+      "name": "controlGroup_kismet-cartographer-control-channel:optionsListDataView",
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview"
+    },
+    {
+      "name": "controlGroup_kismet-cartographer-control-rssi:rangeSliderDataView",
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview"
+    }
+  ]
+}

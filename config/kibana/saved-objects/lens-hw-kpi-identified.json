@@ -1,0 +1,64 @@
+{
+  "id": "kismet-cartographer-lens-hw-kpi-identified",
+  "type": "lens",
+  "attributes": {
+    "title": "Kismet Cartographer - Devices with a known brand",
+    "description": "Wi-Fi devices whose manufacturer could be resolved.",
+    "visualizationType": "lnsMetric",
+    "state": {
+      "datasourceStates": {
+        "formBased": {
+          "layers": {
+            "layer1": {
+              "columnOrder": [
+                "metric"
+              ],
+              "columns": {
+                "metric": {
+                  "label": "Identified",
+                  "customLabel": true,
+                  "dataType": "number",
+                  "operationType": "count",
+                  "isBucketed": false,
+                  "scale": "ratio",
+                  "sourceField": "___records___",
+                  "params": {
+                    "emptyAsNull": false
+                  },
+                  "filter": {
+                    "query": "device.manufacturer : *",
+                    "language": "kuery"
+                  }
+                }
+              },
+              "incompleteColumns": {},
+              "sampling": 1
+            }
+          }
+        }
+      },
+      "filters": [],
+      "query": {
+        "query": "kismet.record : \"device\" and kismet.phy : \"IEEE802.11\"",
+        "language": "kuery"
+      },
+      "visualization": {
+        "layerId": "layer1",
+        "layerType": "data",
+        "metricAccessor": "metric",
+        "color": "#F1F4FA",
+        "showBar": false,
+        "subtitle": "Wi-Fi devices with a known brand"
+      },
+      "adHocDataViews": {},
+      "internalReferences": []
+    }
+  },
+  "references": [
+    {
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview",
+      "name": "indexpattern-datasource-layer-layer1"
+    }
+  ]
+}

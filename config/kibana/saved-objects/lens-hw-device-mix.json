@@ -1,0 +1,100 @@
+{
+  "id": "kismet-cartographer-lens-hw-device-mix",
+  "type": "lens",
+  "attributes": {
+    "title": "Kismet Cartographer - Device - what kind of devices",
+    "description": "Every square is 1% of Wi-Fi devices: access points, clients, bridges and the rest.",
+    "visualizationType": "lnsPie",
+    "state": {
+      "datasourceStates": {
+        "formBased": {
+          "layers": {
+            "layer1": {
+              "columnOrder": [
+                "bucket",
+                "metric"
+              ],
+              "columns": {
+                "metric": {
+                  "label": "Devices",
+                  "customLabel": true,
+                  "dataType": "number",
+                  "operationType": "count",
+                  "isBucketed": false,
+                  "scale": "ratio",
+                  "sourceField": "___records___",
+                  "params": {
+                    "emptyAsNull": false
+                  }
+                },
+                "bucket": {
+                  "label": "Device type",
+                  "customLabel": true,
+                  "dataType": "string",
+                  "operationType": "terms",
+                  "scale": "ordinal",
+                  "sourceField": "kismet.device.type",
+                  "isBucketed": true,
+                  "params": {
+                    "size": 10,
+                    "orderBy": {
+                      "type": "column",
+                      "columnId": "metric"
+                    },
+                    "orderDirection": "desc",
+                    "otherBucket": false,
+                    "missingBucket": false,
+                    "parentFormat": {
+                      "id": "terms"
+                    },
+                    "include": [],
+                    "exclude": [],
+                    "includeIsRegex": false,
+                    "excludeIsRegex": false
+                  }
+                }
+              },
+              "incompleteColumns": {},
+              "sampling": 1
+            }
+          }
+        }
+      },
+      "filters": [],
+      "query": {
+        "query": "kismet.record : \"device\" and kismet.phy : \"IEEE802.11\"",
+        "language": "kuery"
+      },
+      "visualization": {
+        "shape": "waffle",
+        "layers": [
+          {
+            "layerId": "layer1",
+            "primaryGroups": [
+              "bucket"
+            ],
+            "metrics": [
+              "metric"
+            ],
+            "numberDisplay": "percent",
+            "categoryDisplay": "default",
+            "legendDisplay": "show",
+            "legendPosition": "right",
+            "nestedLegend": false,
+            "layerType": "data",
+            "colorMapping": null
+          }
+        ]
+      },
+      "adHocDataViews": {},
+      "internalReferences": []
+    }
+  },
+  "references": [
+    {
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview",
+      "name": "indexpattern-datasource-layer-layer1"
+    }
+  ]
+}

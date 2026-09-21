@@ -1,0 +1,145 @@
+{
+  "id": "kismet-cartographer-lens-hw-width-band",
+  "type": "lens",
+  "attributes": {
+    "title": "Kismet Cartographer - Version - channel width by band",
+    "description": "How wide the access points' channels are, split by 2.4 / 5 / 6 GHz.",
+    "visualizationType": "lnsXY",
+    "state": {
+      "datasourceStates": {
+        "formBased": {
+          "layers": {
+            "layer1": {
+              "columnOrder": [
+                "x",
+                "split",
+                "metric"
+              ],
+              "columns": {
+                "metric": {
+                  "label": "Access points",
+                  "customLabel": true,
+                  "dataType": "number",
+                  "operationType": "count",
+                  "isBucketed": false,
+                  "scale": "ratio",
+                  "sourceField": "___records___",
+                  "params": {
+                    "emptyAsNull": false
+                  }
+                },
+                "x": {
+                  "label": "Channel width",
+                  "customLabel": true,
+                  "dataType": "string",
+                  "operationType": "terms",
+                  "scale": "ordinal",
+                  "sourceField": "wifi.channel_width",
+                  "isBucketed": true,
+                  "params": {
+                    "size": 6,
+                    "orderBy": {
+                      "type": "column",
+                      "columnId": "metric"
+                    },
+                    "orderDirection": "desc",
+                    "otherBucket": false,
+                    "missingBucket": false,
+                    "parentFormat": {
+                      "id": "terms"
+                    },
+                    "include": [],
+                    "exclude": [],
+                    "includeIsRegex": false,
+                    "excludeIsRegex": false
+                  }
+                },
+                "split": {
+                  "label": "Band",
+                  "customLabel": true,
+                  "dataType": "string",
+                  "operationType": "terms",
+                  "scale": "ordinal",
+                  "sourceField": "wifi.band",
+                  "isBucketed": true,
+                  "params": {
+                    "size": 4,
+                    "orderBy": {
+                      "type": "column",
+                      "columnId": "metric"
+                    },
+                    "orderDirection": "desc",
+                    "otherBucket": false,
+                    "missingBucket": false,
+                    "parentFormat": {
+                      "id": "terms"
+                    },
+                    "include": [],
+                    "exclude": [],
+                    "includeIsRegex": false,
+                    "excludeIsRegex": false
+                  }
+                }
+              },
+              "incompleteColumns": {},
+              "sampling": 1
+            }
+          }
+        }
+      },
+      "filters": [],
+      "query": {
+        "query": "kismet.record : \"device\" and kismet.phy : \"IEEE802.11\" and wifi.channel_width : *",
+        "language": "kuery"
+      },
+      "visualization": {
+        "legend": {
+          "isVisible": true,
+          "position": "right"
+        },
+        "valueLabels": "hide",
+        "fittingFunction": "None",
+        "axisTitlesVisibilitySettings": {
+          "x": false,
+          "yLeft": false,
+          "yRight": false
+        },
+        "tickLabelsVisibilitySettings": {
+          "x": true,
+          "yLeft": true,
+          "yRight": true
+        },
+        "gridlinesVisibilitySettings": {
+          "x": false,
+          "yLeft": true,
+          "yRight": false
+        },
+        "preferredSeriesType": "bar_stacked",
+        "layers": [
+          {
+            "layerId": "layer1",
+            "accessors": [
+              "metric"
+            ],
+            "position": "top",
+            "seriesType": "bar_stacked",
+            "showGridlines": false,
+            "layerType": "data",
+            "xAccessor": "x",
+            "colorMapping": null,
+            "splitAccessor": "split"
+          }
+        ]
+      },
+      "adHocDataViews": {},
+      "internalReferences": []
+    }
+  },
+  "references": [
+    {
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview",
+      "name": "indexpattern-datasource-layer-layer1"
+    }
+  ]
+}

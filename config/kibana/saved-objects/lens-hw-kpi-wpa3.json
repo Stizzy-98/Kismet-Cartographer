@@ -1,0 +1,64 @@
+{
+  "id": "kismet-cartographer-lens-hw-kpi-wpa3",
+  "type": "lens",
+  "attributes": {
+    "title": "Kismet Cartographer - APs offering WPA3",
+    "description": "Access points advertising WPA3 (alone or alongside WPA2).",
+    "visualizationType": "lnsMetric",
+    "state": {
+      "datasourceStates": {
+        "formBased": {
+          "layers": {
+            "layer1": {
+              "columnOrder": [
+                "metric"
+              ],
+              "columns": {
+                "metric": {
+                  "label": "WPA3 APs",
+                  "customLabel": true,
+                  "dataType": "number",
+                  "operationType": "count",
+                  "isBucketed": false,
+                  "scale": "ratio",
+                  "sourceField": "___records___",
+                  "params": {
+                    "emptyAsNull": false
+                  },
+                  "filter": {
+                    "query": "wifi.security : (\"WPA3\" or \"WPA2/WPA3\")",
+                    "language": "kuery"
+                  }
+                }
+              },
+              "incompleteColumns": {},
+              "sampling": 1
+            }
+          }
+        }
+      },
+      "filters": [],
+      "query": {
+        "query": "kismet.record : \"device\" and kismet.phy : \"IEEE802.11\"",
+        "language": "kuery"
+      },
+      "visualization": {
+        "layerId": "layer1",
+        "layerType": "data",
+        "metricAccessor": "metric",
+        "color": "#F1F4FA",
+        "showBar": false,
+        "subtitle": "access points with WPA3"
+      },
+      "adHocDataViews": {},
+      "internalReferences": []
+    }
+  },
+  "references": [
+    {
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview",
+      "name": "indexpattern-datasource-layer-layer1"
+    }
+  ]
+}

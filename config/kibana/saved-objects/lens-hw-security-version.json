@@ -1,0 +1,100 @@
+{
+  "id": "kismet-cartographer-lens-hw-security-version",
+  "type": "lens",
+  "attributes": {
+    "title": "Kismet Cartographer - Version - Wi-Fi security generation",
+    "description": "WPA generation the access points advertise (WPA2/WPA3 = transition mode).",
+    "visualizationType": "lnsPie",
+    "state": {
+      "datasourceStates": {
+        "formBased": {
+          "layers": {
+            "layer1": {
+              "columnOrder": [
+                "bucket",
+                "metric"
+              ],
+              "columns": {
+                "metric": {
+                  "label": "Access points",
+                  "customLabel": true,
+                  "dataType": "number",
+                  "operationType": "count",
+                  "isBucketed": false,
+                  "scale": "ratio",
+                  "sourceField": "___records___",
+                  "params": {
+                    "emptyAsNull": false
+                  }
+                },
+                "bucket": {
+                  "label": "Security",
+                  "customLabel": true,
+                  "dataType": "string",
+                  "operationType": "terms",
+                  "scale": "ordinal",
+                  "sourceField": "wifi.security",
+                  "isBucketed": true,
+                  "params": {
+                    "size": 8,
+                    "orderBy": {
+                      "type": "column",
+                      "columnId": "metric"
+                    },
+                    "orderDirection": "desc",
+                    "otherBucket": false,
+                    "missingBucket": false,
+                    "parentFormat": {
+                      "id": "terms"
+                    },
+                    "include": [],
+                    "exclude": [],
+                    "includeIsRegex": false,
+                    "excludeIsRegex": false
+                  }
+                }
+              },
+              "incompleteColumns": {},
+              "sampling": 1
+            }
+          }
+        }
+      },
+      "filters": [],
+      "query": {
+        "query": "kismet.record : \"device\" and kismet.phy : \"IEEE802.11\" and wifi.security : *",
+        "language": "kuery"
+      },
+      "visualization": {
+        "shape": "donut",
+        "layers": [
+          {
+            "layerId": "layer1",
+            "primaryGroups": [
+              "bucket"
+            ],
+            "metrics": [
+              "metric"
+            ],
+            "numberDisplay": "percent",
+            "categoryDisplay": "default",
+            "legendDisplay": "show",
+            "legendPosition": "right",
+            "nestedLegend": false,
+            "layerType": "data",
+            "colorMapping": null
+          }
+        ]
+      },
+      "adHocDataViews": {},
+      "internalReferences": []
+    }
+  },
+  "references": [
+    {
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview",
+      "name": "indexpattern-datasource-layer-layer1"
+    }
+  ]
+}

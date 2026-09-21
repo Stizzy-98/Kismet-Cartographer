@@ -1,0 +1,60 @@
+{
+  "id": "kismet-cartographer-lens-unique-ssids",
+  "type": "lens",
+  "attributes": {
+    "title": "Kismet Cartographer - Unique SSIDs",
+    "description": "Distinct wifi.ssid over Wi-Fi observations and devices.",
+    "visualizationType": "lnsMetric",
+    "state": {
+      "datasourceStates": {
+        "formBased": {
+          "layers": {
+            "layer1": {
+              "columnOrder": [
+                "metric"
+              ],
+              "columns": {
+                "metric": {
+                  "label": "Unique SSIDs",
+                  "customLabel": true,
+                  "dataType": "number",
+                  "operationType": "unique_count",
+                  "isBucketed": false,
+                  "scale": "ratio",
+                  "sourceField": "wifi.ssid",
+                  "params": {
+                    "emptyAsNull": false
+                  }
+                }
+              },
+              "incompleteColumns": {},
+              "sampling": 1
+            }
+          }
+        }
+      },
+      "filters": [],
+      "query": {
+        "query": "kismet.phy : \"IEEE802.11\"",
+        "language": "kuery"
+      },
+      "visualization": {
+        "layerId": "layer1",
+        "layerType": "data",
+        "metricAccessor": "metric",
+        "color": "#F1F4FA",
+        "showBar": false,
+        "subtitle": "distinct wifi.ssid"
+      },
+      "adHocDataViews": {},
+      "internalReferences": []
+    }
+  },
+  "references": [
+    {
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview",
+      "name": "indexpattern-datasource-layer-layer1"
+    }
+  ]
+}

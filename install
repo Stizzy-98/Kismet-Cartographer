@@ -1,0 +1,274 @@
+#!/usr/bin/env python3
+"""install - put Kismet Cartographer into an Elastic Stack (standard ELK, Kubernetes/ECK, Elastic Cloud).
+
+You provide: where Elasticsearch and Kibana are, an API key, and (for a private CA) the CA file.
+Everything else - checks, templates, pipeline, indices, Kibana data view, map and dashboards - is done for you.
+The key can belong to any account (elastic, your own user, a service account); it only has to hold the needed rights.
+
+  ./install --es-url https://localhost:9200 --kibana-url https://localhost:5601 \\
+            --api-key-file ~/kc.key --ca ./ca.crt
+
+  ./install --host 192.168.1.20 --api-key-file ~/kc.key     # no HTTPS: give the address instead of a CA
+
+  ./install --print-api-key-request     # the Dev Tools request that creates a key with exactly the rights needed
+  ./install ... --check                 # only test the connection and the key's permissions
+  ./install ... --dry-run               # show what would change, change nothing
+  ./install ... --save-config           # remember these settings (not the key) so ./ingest needs no flags
+  ./install ... --ingest                # also load the .kismet files in the wardrives/ folder right away
+
+No captures yet? Install first, add your .kismet files to wardrives/ later, then run ./ingest.
+
+Safe to run again at any time (that is also how you upgrade). Only resources named kismet-cartographer-* are
+created or changed; nothing else in your cluster is touched. Exit codes: 0 ok, 1 a step failed,
+2 usage/config problem, 3 cannot connect/authenticate/not permitted.
+"""
+import sys
+
+if sys.version_info < (3, 9):
+    sys.exit("error: Python 3.9 or newer is required (found %s)" % sys.version.split()[0])
+
+import argparse
+import json
+import os
+import subprocess
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent
+sys.path.insert(0, str(ROOT))
+
+from kismet_cartographer.cli_common import (  # noqa: E402
+    Stop, capture_files, child_env, connection_hint, ok, run_step, say, warn, write_env_file)
+from kismet_cartographer.config import add_connection_args, load_config  # noqa: E402
+from kismet_cartographer.esclient import (  # noqa: E402
+    ConnectionFailure, EsError, client_from_config, kibana_client_from_config, kibana_space_path)
+
+TESTED = "9.4"          # the Elastic Stack version this was developed and tested on
+MIN_MAJOR = 8
+
+# What the API key needs. `--print-api-key-request` and the preflight both read this, so docs cannot drift.
+CLUSTER_PRIVS = ["monitor", "manage_index_templates", "manage_ingest_pipelines"]
+INDEX_PRIVS = ["manage", "create_index", "read", "write", "view_index_metadata"]
+INDEX_PATTERN = "kismet-cartographer-*"
+
+
+def role_descriptor(space: str) -> dict:
+    return {"cluster": CLUSTER_PRIVS,
+            "indices": [{"names": [INDEX_PATTERN], "privileges": INDEX_PRIVS}],
+            "applications": [{"application": "kibana-.kibana", "privileges": ["space_all"],
+                              "resources": ["space:" + (space or "default")]}]}
+
+
+def preflight(cfg, args) -> dict:
+    """Everything that can be verified without changing anything. Raises Stop with a fix on the first blocker."""
+    info = {"replicas": 0}
+    say("Checking your stack")
+
+    if not cfg.elastic_url:
+        raise Stop(2, "no Elasticsearch URL", "Pass --es-url https://<host>:9200")
+    if not cfg.api_key:
+        raise Stop(2, "no API key", "Pass --api-key-file <file> (or --api-key, or set ELASTIC_API_KEY). "
+                                    "Create one with: ./install --print-api-key-request")
+    if not args.skip_kibana and not cfg.kibana_url:
+        raise Stop(2, "no Kibana URL", "Pass --kibana-url https://<host>:5601 (or --skip-kibana for Elasticsearch only)")
+    if not cfg.verify_certs:
+        warn("TLS verification is OFF (--insecure): anyone on the network path can read or change this traffic")
+
+    es = client_from_config(cfg, installer=True, timeout=20.0)
+    es.max_retries = 1  # fail fast on a wrong URL; the real work below is more patient
+    try:
+        root = es.get("/")
+    except ConnectionFailure as e:
+        raise Stop(3, f"cannot reach Elasticsearch at {cfg.elastic_url}: {e}", connection_hint(str(e), cfg.elastic_url))
+    except EsError as e:
+        if e.status == 401:
+            raise Stop(3, "Elasticsearch rejected the API key (HTTP 401)",
+                       "The key is wrong, revoked or expired. Pass the 'encoded' value (or id:secret). "
+                       "Create a new one with: ./install --print-api-key-request")
+        if e.status == 403:
+            raise Stop(3, "the API key may not read the cluster root (HTTP 403)",
+                       "It needs the 'monitor' cluster privilege. Create a key with: ./install --print-api-key-request")
+        if "http" in str(e.body).lower() and "https" in str(e.body).lower() or e.status == 400 and cfg.elastic_url.startswith("http://"):
+            raise Stop(3, f"{cfg.elastic_url} seems to require HTTPS", "Use https:// (with --host: add --https) and pass --ca <file>.")
+        raise Stop(3, f"unexpected answer from {cfg.elastic_url}: {e}", "Is this the Elasticsearch URL (not Kibana)?")
+    if not isinstance(root, dict) or "version" not in root:
+        raise Stop(3, f"{cfg.elastic_url} did not answer like Elasticsearch",
+                   "Check the URL: it should be the Elasticsearch port (usually 9200), not Kibana.")
+    ver = root["version"]["number"]
+    major = int(ver.split(".")[0])
+    if root["version"].get("build_flavor") == "serverless":
+        raise Stop(2, "Elasticsearch Serverless is not supported",
+                   "It has no index templates/pipelines as used here. Use Elastic Cloud Hosted or self-managed.")
+    if major < MIN_MAJOR:
+        raise Stop(2, f"Elasticsearch {ver} is too old", f"Version {MIN_MAJOR}.x or newer is required.")
+    ok(f"Elasticsearch {ver} at {cfg.elastic_url}")
+    try:  # whose key is it? (informational: nothing depends on the answer)
+        me = es.get("/_security/_authenticate")
+        kind = (me.get("api_key") or {}).get("name")
+        ok(f"authenticated as '{me.get('username', '?')}'" + (f" (API key '{kind}')" if kind else ""))
+    except EsError:
+        pass
+    plain = [name for name, url in (("Elasticsearch", cfg.elastic_url), ("Kibana", "" if args.skip_kibana else cfg.kibana_url))
+             if url.startswith("http://")]
+    if plain:
+        warn(f"the connection to {' and '.join(plain)} is NOT encrypted (http://): the API key and your data cross the network "
+             "in clear text. Use this only on a network you trust; enable HTTPS on the stack when you can")
+    if not ver.startswith(TESTED):
+        warn(f"developed and tested on {TESTED}.x; {ver} should work but has not been tested")
+
+    # -- permissions, checked up front so a missing right is reported before anything changes
+    want = {"cluster": CLUSTER_PRIVS, "index": [{"names": [INDEX_PATTERN], "privileges": INDEX_PRIVS}]}
+    space = cfg.space or "default"
+    if not args.skip_kibana:
+        want["application"] = [{"application": "kibana-.kibana", "resources": ["space:" + space],
+                                "privileges": ["space_all"]}]
+    try:
+        have = es.post("/_security/user/_has_privileges", want)
+    except EsError as e:
+        raise Stop(3, f"could not check the key's privileges: {e}", "Security may be disabled, or the key is unusual.")
+    missing = [f"cluster: {k}" for k, v in have.get("cluster", {}).items() if not v]
+    for pattern, privs in have.get("index", {}).items():
+        missing += [f"index {pattern}: {k}" for k, v in privs.items() if not v]
+    for app, res in have.get("application", {}).items():
+        for r, privs in res.items():
+            missing += [f"Kibana {r}: {k}" for k, v in privs.items() if not v]
+    if missing:
+        raise Stop(3, "the API key is missing permissions:\n" + "\n".join("      - " + m for m in missing),
+                   "Create a key with the right role: ./install --print-api-key-request"
+                   + ("" if not cfg.space else f" --space {cfg.space}   (and check that space exists in Kibana)"))
+    ok("API key has all the permissions it needs")
+
+    # -- Kibana
+    if not args.skip_kibana:
+        kb = kibana_client_from_config(cfg)
+        kb.timeout, kb.max_retries = 30.0, 1
+        try:
+            st = kb.get("/api/status")
+        except ConnectionFailure as e:
+            raise Stop(3, f"cannot reach Kibana at {cfg.kibana_url}: {e}", connection_hint(str(e), cfg.kibana_url))
+        except EsError as e:
+            raise Stop(3, f"Kibana answered {e.status} to the status request: {e}",
+                       "Check the Kibana URL (include a base path such as /kibana if Kibana is served under one).")
+        kver = (st.get("version") or {}).get("number", "?")
+        ok(f"Kibana {kver} at {cfg.kibana_url}" + (f" (space '{cfg.space}')" if cfg.space else ""))
+        if kver.split(".")[0] != ver.split(".")[0]:
+            warn(f"Kibana {kver} and Elasticsearch {ver} have different major versions")
+        try:
+            kb.get("/api/data_views")
+        except EsError as e:
+            if e.status == 404 and cfg.space:
+                raise Stop(3, f"Kibana space '{cfg.space}' does not exist", "Create it in Kibana, or omit --space.")
+            if e.status in (401, 403):
+                raise Stop(3, f"Kibana refused the key ({e.status})",
+                           "The key needs the Kibana privilege space_all on the target space "
+                           "(./install --print-api-key-request).")
+            raise Stop(3, f"Kibana API check failed: {e}", "")
+        ok("Kibana accepts the key")
+
+    # -- replicas: a replica can only be placed on a second data node
+    if args.replicas is not None:
+        info["replicas"], why = args.replicas, "as requested"
+    else:
+        try:
+            roles = [n.get("node.role", "") for n in es.get("/_cat/nodes", params={"h": "node.role", "format": "json"})]
+            data_nodes = sum(1 for r in roles if any(c in r for c in "dhwcsf"))
+            info["replicas"], why = (1 if data_nodes >= 2 else 0), f"{data_nodes} data node(s)"
+        except EsError:
+            info["replicas"], why = 0, "could not count data nodes"
+    ok(f"index replicas: {info['replicas']} ({why})")
+    return info
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    add_connection_args(ap, kibana=True)
+    ap.add_argument("--replicas", type=int, default=None,
+                    help="replicas for the new indices (default: 1 if the cluster has 2+ data nodes, else 0)")
+    ap.add_argument("--check", action="store_true", help="only test the connection and permissions, then stop")
+    ap.add_argument("--dry-run", action="store_true", help="show what would be done, change nothing")
+    ap.add_argument("--skip-kibana", action="store_true", help="install the Elasticsearch part only")
+    ap.add_argument("--ingest", metavar="PATH", nargs="?", const=str(ROOT / "wardrives"),
+                    help="after installing, load .kismet files: from PATH, or from the wardrives/ folder if no PATH is given")
+    ap.add_argument("--validate", action="store_true", help="after --ingest, compare what was stored with the source files")
+    ap.add_argument("--save-config", metavar="FILE", nargs="?", const=str(ROOT / ".env"),
+                    help="after a successful install, save the connection settings to FILE (default: .env in this folder, mode 600, "
+                         "git-ignored) so ./ingest needs no flags. The API key is never saved, only the path of its file")
+    ap.add_argument("--test", action="store_true", help="run the offline unit tests first")
+    ap.add_argument("--print-api-key-request", action="store_true",
+                    help="print the Kibana Dev Tools request that creates an API key with exactly the rights needed, and exit")
+    args = ap.parse_args()
+
+    if args.print_api_key_request:
+        body = {"name": "kismet-cartographer", "expiration": "90d",
+                "role_descriptors": {"kismet-cartographer": role_descriptor(args.space or "default")}}
+        say("# Paste into Kibana -> Dev Tools -> Console, run it, and copy the value of \"encoded\".\n"
+            "# Elasticsearch shows the secret only once. Change \"expiration\" or remove it to suit.")
+        say("POST /_security/api_key\n" + json.dumps(body, indent=2))
+        return 0
+
+    try:
+        cfg = load_config(args=args)
+    except SystemExit as e:
+        say(str(e))
+        return 2
+    say("Kismet Cartographer installer\n")
+    try:
+        if args.test:
+            say("Running the offline unit tests")
+            if subprocess.call([sys.executable, "-m", "unittest", "discover", "-s", str(ROOT / "tests")], cwd=ROOT):
+                raise Stop(1, "unit tests failed", "")
+        info = preflight(cfg, args)
+        if args.check:
+            say("\nAll checks passed. Run again without --check to install.")
+            return 0
+
+        env = child_env(cfg)
+        run_step("Elasticsearch: templates, ingest pipeline, indices, aliases", "install_elastic.py",
+                 ["--replicas", str(info["replicas"])], env, args.dry_run)
+        if not args.skip_kibana:
+            run_step("Kibana: data view, map, dashboards", "install_kibana.py", [], env, args.dry_run)
+        if args.ingest and not args.dry_run and not capture_files(args.ingest):
+            say(f"\n==> Loading captures\n  No .kismet files found in {args.ingest} yet - that is fine, the setup is done.")
+        elif args.ingest and not args.dry_run:
+            run_step(f"Loading {args.ingest}", "ingest_kismet.py",
+                     [args.ingest, "--skip-complete", "--allow-parse-errors"], env, False)
+            if args.validate:
+                run_step("Validating the load", "validate_elastic.py", ["--source", args.ingest], env, False)
+    except Stop as s:
+        say(f"\n  [FAIL] {s.msg}")
+        if s.fix:
+            say(f"         Fix: {s.fix}")
+        return s.code
+    except KeyboardInterrupt:
+        say("\ninterrupted")
+        return 1
+
+    saved = ""
+    if args.save_config and not args.dry_run:
+        try:
+            key_file = getattr(args, "api_key_file", None) or os.environ.get("ELASTIC_API_KEY_FILE", "")
+            names = write_env_file(cfg, Path(args.save_config), key_file)
+            saved = str(Path(args.save_config).resolve())
+            say(f"\n  Saved settings to {saved} (mode 600): {', '.join(names)}")
+            if not key_file:
+                warn("the API key was not given as a file, so it is NOT saved; keep using --api-key-file / ELASTIC_API_KEY, "
+                     "or save the key to a file (chmod 600) and re-run with --api-key-file")
+        except FileExistsError as e:
+            warn(str(e))
+
+    base = cfg.kibana_url + kibana_space_path(cfg.space)
+    say("\n==> Done" + (" (dry run: nothing was changed)" if args.dry_run else ""))
+    files = capture_files(ROOT / "wardrives")
+    if not args.ingest and not args.dry_run:
+        if files:
+            say(f"  {len(files)} capture file(s) are waiting in wardrives/. Load them with:  ./ingest" + ("" if saved else "  (plus the same connection flags)"))
+        else:
+            say("  Next: copy your .kismet files into the wardrives/ folder, then run:  ./ingest" +
+                ("" if saved else "  (plus the same connection flags; use --save-config to avoid repeating them)"))
+    if not args.skip_kibana:
+        say(f"  Dashboards: {base}/app/dashboards   ->  \"Kismet Cartographer - Overview\" and \"... - Devices & Hardware\"")
+        say("  Set the time range to the dates you captured on.")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -1,0 +1,117 @@
+{
+  "id": "kismet-cartographer-lens-hw-brand-top",
+  "type": "lens",
+  "attributes": {
+    "title": "Kismet Cartographer - Brand - top 15 brands",
+    "description": "Wi-Fi devices per brand, ranked. Brand = OUI manufacturer, or the maker the device announced in WPS.",
+    "visualizationType": "lnsXY",
+    "state": {
+      "datasourceStates": {
+        "formBased": {
+          "layers": {
+            "layer1": {
+              "columnOrder": [
+                "bucket",
+                "metric"
+              ],
+              "columns": {
+                "metric": {
+                  "label": "Devices",
+                  "customLabel": true,
+                  "dataType": "number",
+                  "operationType": "count",
+                  "isBucketed": false,
+                  "scale": "ratio",
+                  "sourceField": "___records___",
+                  "params": {
+                    "emptyAsNull": false
+                  }
+                },
+                "bucket": {
+                  "label": "Brand",
+                  "customLabel": true,
+                  "dataType": "string",
+                  "operationType": "terms",
+                  "scale": "ordinal",
+                  "sourceField": "device.manufacturer",
+                  "isBucketed": true,
+                  "params": {
+                    "size": 15,
+                    "orderBy": {
+                      "type": "column",
+                      "columnId": "metric"
+                    },
+                    "orderDirection": "desc",
+                    "otherBucket": false,
+                    "missingBucket": false,
+                    "parentFormat": {
+                      "id": "terms"
+                    },
+                    "include": [],
+                    "exclude": [],
+                    "includeIsRegex": false,
+                    "excludeIsRegex": false
+                  }
+                }
+              },
+              "incompleteColumns": {},
+              "sampling": 1
+            }
+          }
+        }
+      },
+      "filters": [],
+      "query": {
+        "query": "kismet.record : \"device\" and kismet.phy : \"IEEE802.11\" and device.manufacturer : *",
+        "language": "kuery"
+      },
+      "visualization": {
+        "legend": {
+          "isVisible": false,
+          "position": "right"
+        },
+        "valueLabels": "show",
+        "fittingFunction": "None",
+        "axisTitlesVisibilitySettings": {
+          "x": false,
+          "yLeft": false,
+          "yRight": false
+        },
+        "tickLabelsVisibilitySettings": {
+          "x": true,
+          "yLeft": true,
+          "yRight": true
+        },
+        "gridlinesVisibilitySettings": {
+          "x": false,
+          "yLeft": true,
+          "yRight": false
+        },
+        "preferredSeriesType": "bar_horizontal",
+        "layers": [
+          {
+            "layerId": "layer1",
+            "accessors": [
+              "metric"
+            ],
+            "position": "top",
+            "seriesType": "bar_horizontal",
+            "showGridlines": false,
+            "layerType": "data",
+            "xAccessor": "bucket",
+            "colorMapping": null
+          }
+        ]
+      },
+      "adHocDataViews": {},
+      "internalReferences": []
+    }
+  },
+  "references": [
+    {
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview",
+      "name": "indexpattern-datasource-layer-layer1"
+    }
+  ]
+}

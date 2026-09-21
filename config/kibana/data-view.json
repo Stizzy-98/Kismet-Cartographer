@@ -1,0 +1,60 @@
+{
+  "fallback_id": "kismet-cartographer-dataview",
+  "data_view": {
+    "title": "kismet-cartographer-*",
+    "name": "Kismet Cartographer",
+    "timeFieldName": "@timestamp",
+    "allowNoIndex": true,
+    "fieldFormats": {
+      "wifi.rssi": {
+        "id": "number",
+        "params": {
+          "pattern": "0.[0] dBm"
+        }
+      },
+      "wifi.frequency": {
+        "id": "number",
+        "params": {
+          "pattern": "0,0.[0] MHz"
+        }
+      },
+      "aircraft.altitude": {
+        "id": "number",
+        "params": {
+          "pattern": "0,0 ft"
+        }
+      },
+      "gps.altitude": {
+        "id": "number",
+        "params": {
+          "pattern": "0,0.[0] m"
+        }
+      },
+      "kismet.source.file_size": {
+        "id": "bytes"
+      }
+    },
+    "fieldAttrs": {
+      "geo.location": {
+        "customLabel": "Position (meaning depends on geo.location_type)"
+      },
+      "geo.location_type": {
+        "customLabel": "Position meaning (observer / observer_centroid / emitter_reported)"
+      },
+      "geo.peak_signal_location": {
+        "customLabel": "Collector position of the strongest signal"
+      },
+      "wifi.rssi": {
+        "customLabel": "Signal strength (dBm)"
+      },
+      "kismet.source.file": {
+        "customLabel": "Capture file"
+      }
+    }
+  },
+  "_meta": {
+    "project": "kismet-cartographer",
+    "docs": "docs/kibana-maps.md",
+    "description": "Data view used by every Kibana object of this project. The installer reuses an existing data view whose title is kismet-cartographer-* (whatever its id) and only creates this one, with the fallback id, when none exists. Field formats/labels above are applied on creation only; an existing user-owned data view is never rewritten."
+  }
+}

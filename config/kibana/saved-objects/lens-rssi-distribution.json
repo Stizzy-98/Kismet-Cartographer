@@ -1,0 +1,112 @@
+{
+  "id": "kismet-cartographer-lens-rssi-distribution",
+  "type": "lens",
+  "attributes": {
+    "title": "Kismet Cartographer - Signal strength distribution",
+    "description": "Histogram of wifi.rssi (dBm) over Wi-Fi packet observations.",
+    "visualizationType": "lnsXY",
+    "state": {
+      "datasourceStates": {
+        "formBased": {
+          "layers": {
+            "layer1": {
+              "columnOrder": [
+                "bucket",
+                "metric"
+              ],
+              "columns": {
+                "metric": {
+                  "label": "Observations",
+                  "customLabel": true,
+                  "dataType": "number",
+                  "operationType": "count",
+                  "isBucketed": false,
+                  "scale": "ratio",
+                  "sourceField": "___records___",
+                  "params": {
+                    "emptyAsNull": false
+                  }
+                },
+                "bucket": {
+                  "label": "Signal strength (dBm)",
+                  "customLabel": true,
+                  "dataType": "number",
+                  "operationType": "range",
+                  "sourceField": "wifi.rssi",
+                  "isBucketed": true,
+                  "scale": "interval",
+                  "params": {
+                    "includeEmptyRows": true,
+                    "type": "histogram",
+                    "maxBars": "auto",
+                    "ranges": [
+                      {
+                        "from": 0,
+                        "to": 1000,
+                        "label": ""
+                      }
+                    ]
+                  }
+                }
+              },
+              "incompleteColumns": {},
+              "sampling": 1
+            }
+          }
+        }
+      },
+      "filters": [],
+      "query": {
+        "query": "kismet.record : \"wifi.packet\" and wifi.rssi : *",
+        "language": "kuery"
+      },
+      "visualization": {
+        "legend": {
+          "isVisible": false,
+          "position": "right"
+        },
+        "valueLabels": "hide",
+        "fittingFunction": "None",
+        "axisTitlesVisibilitySettings": {
+          "x": true,
+          "yLeft": false,
+          "yRight": true
+        },
+        "tickLabelsVisibilitySettings": {
+          "x": true,
+          "yLeft": true,
+          "yRight": true
+        },
+        "gridlinesVisibilitySettings": {
+          "x": false,
+          "yLeft": true,
+          "yRight": true
+        },
+        "preferredSeriesType": "bar_stacked",
+        "layers": [
+          {
+            "layerId": "layer1",
+            "accessors": [
+              "metric"
+            ],
+            "position": "top",
+            "seriesType": "bar_stacked",
+            "showGridlines": false,
+            "layerType": "data",
+            "xAccessor": "bucket",
+            "colorMapping": null
+          }
+        ]
+      },
+      "adHocDataViews": {},
+      "internalReferences": []
+    }
+  },
+  "references": [
+    {
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview",
+      "name": "indexpattern-datasource-layer-layer1"
+    }
+  ]
+}

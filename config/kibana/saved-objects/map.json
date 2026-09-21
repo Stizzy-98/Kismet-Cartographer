@@ -1,0 +1,1286 @@
+{
+  "id": "kismet-cartographer-map",
+  "type": "map",
+  "attributes": {
+    "title": "Kismet Cartographer - Map",
+    "description": "Kismet captures on a map. geo.location means different things per layer: observer = where the collector was; observer_centroid = average collector position for a device; emitter_reported = the aircraft's own ADS-B position.",
+    "layerListJSON": [
+      {
+        "id": "kismet-layer-basemap",
+        "label": "Road map (Elastic Maps Service)",
+        "sourceDescriptor": {
+          "type": "EMS_TMS",
+          "isAutoSelect": true,
+          "lightModeDefault": "road_map_desaturated"
+        },
+        "type": "EMS_VECTOR_TILE",
+        "visible": true,
+        "alpha": 1,
+        "minZoom": 0,
+        "maxZoom": 24,
+        "style": {
+          "type": "TILE"
+        },
+        "includeInFitToBounds": false
+      },
+      {
+        "id": "kismet-layer-6",
+        "label": "Wi-Fi observation DENSITY - COLLECTOR positions (heat map, kismet.record: wifi.packet)",
+        "sourceDescriptor": {
+          "type": "ES_GEO_GRID",
+          "id": "kismet-source-6",
+          "geoField": "geo.location",
+          "requestType": "heatmap",
+          "resolution": "MOST_FINE",
+          "metrics": [
+            {
+              "type": "count"
+            }
+          ],
+          "applyGlobalQuery": true,
+          "applyGlobalTime": true,
+          "applyForceRefresh": true,
+          "indexPatternRefName": "layer_6_source_index_pattern"
+        },
+        "type": "HEATMAP",
+        "visible": false,
+        "alpha": 0.75,
+        "minZoom": 0,
+        "maxZoom": 24,
+        "query": {
+          "query": "kismet.record : \"wifi.packet\"",
+          "language": "kuery"
+        },
+        "style": {
+          "type": "HEATMAP",
+          "colorRampName": "theclassic"
+        },
+        "includeInFitToBounds": true
+      },
+      {
+        "id": "kismet-layer-7",
+        "label": "Wi-Fi observations - COUNT per area (bubbles, COLLECTOR positions)",
+        "sourceDescriptor": {
+          "type": "ES_GEO_GRID",
+          "id": "kismet-source-7",
+          "geoField": "geo.location",
+          "requestType": "point",
+          "resolution": "FINE",
+          "metrics": [
+            {
+              "type": "count"
+            }
+          ],
+          "applyGlobalQuery": true,
+          "applyGlobalTime": true,
+          "applyForceRefresh": true,
+          "indexPatternRefName": "layer_7_source_index_pattern"
+        },
+        "type": "GEOJSON_VECTOR",
+        "visible": true,
+        "alpha": 0.75,
+        "minZoom": 0,
+        "maxZoom": 13,
+        "joins": [],
+        "query": {
+          "query": "kismet.record : \"wifi.packet\"",
+          "language": "kuery"
+        },
+        "style": {
+          "type": "VECTOR",
+          "properties": {
+            "icon": {
+              "type": "STATIC",
+              "options": {
+                "value": "marker"
+              }
+            },
+            "fillColor": {
+              "type": "DYNAMIC",
+              "options": {
+                "color": "Yellow to Red",
+                "colorCategory": "palette_0",
+                "field": {
+                  "name": "doc_count",
+                  "origin": "source"
+                },
+                "fieldMetaOptions": {
+                  "isEnabled": true,
+                  "sigma": 3
+                },
+                "type": "ORDINAL"
+              }
+            },
+            "lineColor": {
+              "type": "STATIC",
+              "options": {
+                "color": "#343741"
+              }
+            },
+            "lineWidth": {
+              "type": "STATIC",
+              "options": {
+                "size": 1
+              }
+            },
+            "iconSize": {
+              "type": "DYNAMIC",
+              "options": {
+                "minSize": 8,
+                "maxSize": 40,
+                "field": {
+                  "name": "doc_count",
+                  "origin": "source"
+                },
+                "fieldMetaOptions": {
+                  "isEnabled": true,
+                  "sigma": 3
+                }
+              }
+            },
+            "iconOrientation": {
+              "type": "STATIC",
+              "options": {
+                "orientation": 0
+              }
+            },
+            "labelText": {
+              "type": "DYNAMIC",
+              "options": {
+                "field": {
+                  "name": "doc_count",
+                  "origin": "source"
+                }
+              }
+            },
+            "labelColor": {
+              "type": "STATIC",
+              "options": {
+                "color": "#000000"
+              }
+            },
+            "labelSize": {
+              "type": "STATIC",
+              "options": {
+                "size": 12
+              }
+            },
+            "labelBorderColor": {
+              "type": "STATIC",
+              "options": {
+                "color": "#FFFFFF"
+              }
+            },
+            "symbolizeAs": {
+              "options": {
+                "value": "circle"
+              }
+            },
+            "labelBorderSize": {
+              "options": {
+                "size": "SMALL"
+              }
+            }
+          },
+          "isTimeAware": true
+        },
+        "includeInFitToBounds": true,
+        "disableTooltips": false
+      },
+      {
+        "id": "kismet-layer-8",
+        "label": "Aircraft ADS-B frames - COUNT per area (bubbles, EMITTER-REPORTED positions)",
+        "sourceDescriptor": {
+          "type": "ES_GEO_GRID",
+          "id": "kismet-source-8",
+          "geoField": "geo.location",
+          "requestType": "point",
+          "resolution": "FINE",
+          "metrics": [
+            {
+              "type": "count"
+            }
+          ],
+          "applyGlobalQuery": true,
+          "applyGlobalTime": true,
+          "applyForceRefresh": true,
+          "indexPatternRefName": "layer_8_source_index_pattern"
+        },
+        "type": "GEOJSON_VECTOR",
+        "visible": false,
+        "alpha": 0.75,
+        "minZoom": 0,
+        "maxZoom": 24,
+        "joins": [],
+        "query": {
+          "query": "geo.location_type : \"emitter_reported\"",
+          "language": "kuery"
+        },
+        "style": {
+          "type": "VECTOR",
+          "properties": {
+            "icon": {
+              "type": "STATIC",
+              "options": {
+                "value": "marker"
+              }
+            },
+            "fillColor": {
+              "type": "DYNAMIC",
+              "options": {
+                "color": "Blues",
+                "colorCategory": "palette_0",
+                "field": {
+                  "name": "doc_count",
+                  "origin": "source"
+                },
+                "fieldMetaOptions": {
+                  "isEnabled": true,
+                  "sigma": 3
+                },
+                "type": "ORDINAL"
+              }
+            },
+            "lineColor": {
+              "type": "STATIC",
+              "options": {
+                "color": "#343741"
+              }
+            },
+            "lineWidth": {
+              "type": "STATIC",
+              "options": {
+                "size": 1
+              }
+            },
+            "iconSize": {
+              "type": "DYNAMIC",
+              "options": {
+                "minSize": 8,
+                "maxSize": 32,
+                "field": {
+                  "name": "doc_count",
+                  "origin": "source"
+                },
+                "fieldMetaOptions": {
+                  "isEnabled": true,
+                  "sigma": 3
+                }
+              }
+            },
+            "iconOrientation": {
+              "type": "STATIC",
+              "options": {
+                "orientation": 0
+              }
+            },
+            "labelText": {
+              "type": "DYNAMIC",
+              "options": {
+                "field": {
+                  "name": "doc_count",
+                  "origin": "source"
+                }
+              }
+            },
+            "labelColor": {
+              "type": "STATIC",
+              "options": {
+                "color": "#000000"
+              }
+            },
+            "labelSize": {
+              "type": "STATIC",
+              "options": {
+                "size": 12
+              }
+            },
+            "labelBorderColor": {
+              "type": "STATIC",
+              "options": {
+                "color": "#FFFFFF"
+              }
+            },
+            "symbolizeAs": {
+              "options": {
+                "value": "circle"
+              }
+            },
+            "labelBorderSize": {
+              "options": {
+                "size": "SMALL"
+              }
+            }
+          },
+          "isTimeAware": true
+        },
+        "includeInFitToBounds": true,
+        "disableTooltips": false
+      },
+      {
+        "id": "kismet-layer-2",
+        "label": "Aircraft - ADS-B REPORTED position (geo.location_type: emitter_reported)",
+        "sourceDescriptor": {
+          "type": "ES_SEARCH",
+          "id": "kismet-source-2",
+          "geoField": "geo.location",
+          "filterByMapBounds": true,
+          "scalingType": "MVT",
+          "tooltipProperties": [
+            "@timestamp",
+            "aircraft.icao",
+            "aircraft.callsign",
+            "aircraft.registration",
+            "aircraft.type",
+            "aircraft.owner",
+            "aircraft.altitude",
+            "aircraft.speed",
+            "aircraft.heading",
+            "kismet.record",
+            "kismet.datasource.name",
+            "kismet.source.file",
+            "geo.location_type"
+          ],
+          "sortField": "@timestamp",
+          "sortOrder": "desc",
+          "topHitsSplitField": "",
+          "topHitsSize": 1,
+          "applyGlobalQuery": true,
+          "applyGlobalTime": true,
+          "applyForceRefresh": true,
+          "indexPatternRefName": "layer_2_source_index_pattern"
+        },
+        "type": "MVT_VECTOR",
+        "visible": false,
+        "alpha": 0.6,
+        "minZoom": 0,
+        "maxZoom": 24,
+        "joins": [],
+        "query": {
+          "query": "geo.location_type : \"emitter_reported\"",
+          "language": "kuery"
+        },
+        "style": {
+          "type": "VECTOR",
+          "properties": {
+            "icon": {
+              "type": "STATIC",
+              "options": {
+                "value": "marker"
+              }
+            },
+            "fillColor": {
+              "type": "STATIC",
+              "options": {
+                "color": "#E7664C"
+              }
+            },
+            "lineColor": {
+              "type": "STATIC",
+              "options": {
+                "color": "#343741"
+              }
+            },
+            "lineWidth": {
+              "type": "STATIC",
+              "options": {
+                "size": 0.5
+              }
+            },
+            "iconSize": {
+              "type": "STATIC",
+              "options": {
+                "size": 4
+              }
+            },
+            "iconOrientation": {
+              "type": "STATIC",
+              "options": {
+                "orientation": 0
+              }
+            },
+            "labelText": {
+              "type": "STATIC",
+              "options": {
+                "value": ""
+              }
+            },
+            "labelColor": {
+              "type": "STATIC",
+              "options": {
+                "color": "#000000"
+              }
+            },
+            "labelSize": {
+              "type": "STATIC",
+              "options": {
+                "size": 14
+              }
+            },
+            "labelBorderColor": {
+              "type": "STATIC",
+              "options": {
+                "color": "#FFFFFF"
+              }
+            },
+            "symbolizeAs": {
+              "options": {
+                "value": "circle"
+              }
+            },
+            "labelBorderSize": {
+              "options": {
+                "size": "SMALL"
+              }
+            }
+          },
+          "isTimeAware": true
+        },
+        "includeInFitToBounds": true,
+        "disableTooltips": false
+      },
+      {
+        "id": "kismet-layer-1",
+        "label": "Wi-Fi observations - COLLECTOR position (kismet.record: wifi.packet)",
+        "sourceDescriptor": {
+          "type": "ES_SEARCH",
+          "id": "kismet-source-1",
+          "geoField": "geo.location",
+          "filterByMapBounds": true,
+          "scalingType": "MVT",
+          "tooltipProperties": [
+            "@timestamp",
+            "wifi.ssid",
+            "wifi.bssid",
+            "wifi.mac",
+            "source.mac",
+            "destination.mac",
+            "wifi.rssi",
+            "wifi.frequency",
+            "wifi.channel",
+            "wifi.band",
+            "kismet.datasource.name",
+            "kismet.source.file",
+            "geo.location_type"
+          ],
+          "sortField": "@timestamp",
+          "sortOrder": "desc",
+          "topHitsSplitField": "",
+          "topHitsSize": 1,
+          "applyGlobalQuery": true,
+          "applyGlobalTime": true,
+          "applyForceRefresh": true,
+          "indexPatternRefName": "layer_1_source_index_pattern"
+        },
+        "type": "MVT_VECTOR",
+        "visible": true,
+        "alpha": 0.9,
+        "minZoom": 12,
+        "maxZoom": 24,
+        "joins": [],
+        "query": {
+          "query": "kismet.record : \"wifi.packet\"",
+          "language": "kuery"
+        },
+        "style": {
+          "type": "VECTOR",
+          "properties": {
+            "icon": {
+              "type": "STATIC",
+              "options": {
+                "value": "marker"
+              }
+            },
+            "fillColor": {
+              "type": "STATIC",
+              "options": {
+                "color": "#FFFFFF"
+              }
+            },
+            "lineColor": {
+              "type": "STATIC",
+              "options": {
+                "color": "#343741"
+              }
+            },
+            "lineWidth": {
+              "type": "STATIC",
+              "options": {
+                "size": 1
+              }
+            },
+            "iconSize": {
+              "type": "STATIC",
+              "options": {
+                "size": 3
+              }
+            },
+            "iconOrientation": {
+              "type": "STATIC",
+              "options": {
+                "orientation": 0
+              }
+            },
+            "labelText": {
+              "type": "STATIC",
+              "options": {
+                "value": ""
+              }
+            },
+            "labelColor": {
+              "type": "STATIC",
+              "options": {
+                "color": "#000000"
+              }
+            },
+            "labelSize": {
+              "type": "STATIC",
+              "options": {
+                "size": 14
+              }
+            },
+            "labelBorderColor": {
+              "type": "STATIC",
+              "options": {
+                "color": "#FFFFFF"
+              }
+            },
+            "symbolizeAs": {
+              "options": {
+                "value": "circle"
+              }
+            },
+            "labelBorderSize": {
+              "options": {
+                "size": "SMALL"
+              }
+            }
+          },
+          "isTimeAware": true
+        },
+        "includeInFitToBounds": true,
+        "disableTooltips": false
+      },
+      {
+        "id": "kismet-layer-3",
+        "label": "Wi-Fi devices - OBSERVATION CENTROID, not the transmitter location",
+        "sourceDescriptor": {
+          "type": "ES_SEARCH",
+          "id": "kismet-source-3",
+          "geoField": "geo.location",
+          "filterByMapBounds": true,
+          "scalingType": "MVT",
+          "tooltipProperties": [
+            "@timestamp",
+            "kismet.device.type",
+            "wifi.ssid",
+            "wifi.bssid",
+            "wifi.mac",
+            "kismet.device_key",
+            "wifi.crypt",
+            "wifi.channel",
+            "wifi.band",
+            "kismet.device.strongest_signal",
+            "kismet.device.packets_total",
+            "kismet.source.file",
+            "geo.location_type"
+          ],
+          "sortField": "@timestamp",
+          "sortOrder": "desc",
+          "topHitsSplitField": "",
+          "topHitsSize": 1,
+          "applyGlobalQuery": true,
+          "applyGlobalTime": true,
+          "applyForceRefresh": true,
+          "indexPatternRefName": "layer_3_source_index_pattern"
+        },
+        "type": "MVT_VECTOR",
+        "visible": false,
+        "alpha": 0.75,
+        "minZoom": 0,
+        "maxZoom": 24,
+        "joins": [],
+        "query": {
+          "query": "kismet.record : \"device\" and geo.location_type : \"observer_centroid\"",
+          "language": "kuery"
+        },
+        "style": {
+          "type": "VECTOR",
+          "properties": {
+            "icon": {
+              "type": "STATIC",
+              "options": {
+                "value": "marker"
+              }
+            },
+            "fillColor": {
+              "type": "DYNAMIC",
+              "options": {
+                "colorCategory": "palette_0",
+                "field": {
+                  "name": "kismet.device.type",
+                  "origin": "source"
+                },
+                "fieldMetaOptions": {
+                  "isEnabled": true,
+                  "sigma": 3
+                },
+                "type": "CATEGORICAL"
+              }
+            },
+            "lineColor": {
+              "type": "STATIC",
+              "options": {
+                "color": "#343741"
+              }
+            },
+            "lineWidth": {
+              "type": "STATIC",
+              "options": {
+                "size": 1
+              }
+            },
+            "iconSize": {
+              "type": "STATIC",
+              "options": {
+                "size": 7
+              }
+            },
+            "iconOrientation": {
+              "type": "STATIC",
+              "options": {
+                "orientation": 0
+              }
+            },
+            "labelText": {
+              "type": "STATIC",
+              "options": {
+                "value": ""
+              }
+            },
+            "labelColor": {
+              "type": "STATIC",
+              "options": {
+                "color": "#000000"
+              }
+            },
+            "labelSize": {
+              "type": "STATIC",
+              "options": {
+                "size": 14
+              }
+            },
+            "labelBorderColor": {
+              "type": "STATIC",
+              "options": {
+                "color": "#FFFFFF"
+              }
+            },
+            "symbolizeAs": {
+              "options": {
+                "value": "circle"
+              }
+            },
+            "labelBorderSize": {
+              "options": {
+                "size": "SMALL"
+              }
+            }
+          },
+          "isTimeAware": true
+        },
+        "includeInFitToBounds": true,
+        "disableTooltips": false
+      },
+      {
+        "id": "kismet-layer-4",
+        "label": "Collector GPS track - COLLECTOR position (kismet.record: gps.snapshot)",
+        "sourceDescriptor": {
+          "type": "ES_SEARCH",
+          "id": "kismet-source-4",
+          "geoField": "geo.location",
+          "filterByMapBounds": true,
+          "scalingType": "MVT",
+          "tooltipProperties": [
+            "@timestamp",
+            "gps.altitude",
+            "gps.speed",
+            "gps.heading",
+            "gps.fix",
+            "gps.name",
+            "kismet.source.file",
+            "geo.location_type"
+          ],
+          "sortField": "@timestamp",
+          "sortOrder": "desc",
+          "topHitsSplitField": "",
+          "topHitsSize": 1,
+          "applyGlobalQuery": true,
+          "applyGlobalTime": true,
+          "applyForceRefresh": true,
+          "indexPatternRefName": "layer_4_source_index_pattern"
+        },
+        "type": "MVT_VECTOR",
+        "visible": true,
+        "alpha": 0.9,
+        "minZoom": 0,
+        "maxZoom": 24,
+        "joins": [],
+        "query": {
+          "query": "kismet.record : \"gps.snapshot\"",
+          "language": "kuery"
+        },
+        "style": {
+          "type": "VECTOR",
+          "properties": {
+            "icon": {
+              "type": "STATIC",
+              "options": {
+                "value": "marker"
+              }
+            },
+            "fillColor": {
+              "type": "STATIC",
+              "options": {
+                "color": "#2965CC"
+              }
+            },
+            "lineColor": {
+              "type": "STATIC",
+              "options": {
+                "color": "#FFFFFF"
+              }
+            },
+            "lineWidth": {
+              "type": "STATIC",
+              "options": {
+                "size": 1
+              }
+            },
+            "iconSize": {
+              "type": "STATIC",
+              "options": {
+                "size": 5
+              }
+            },
+            "iconOrientation": {
+              "type": "STATIC",
+              "options": {
+                "orientation": 0
+              }
+            },
+            "labelText": {
+              "type": "STATIC",
+              "options": {
+                "value": ""
+              }
+            },
+            "labelColor": {
+              "type": "STATIC",
+              "options": {
+                "color": "#000000"
+              }
+            },
+            "labelSize": {
+              "type": "STATIC",
+              "options": {
+                "size": 14
+              }
+            },
+            "labelBorderColor": {
+              "type": "STATIC",
+              "options": {
+                "color": "#FFFFFF"
+              }
+            },
+            "symbolizeAs": {
+              "options": {
+                "value": "circle"
+              }
+            },
+            "labelBorderSize": {
+              "options": {
+                "size": "SMALL"
+              }
+            }
+          },
+          "isTimeAware": true
+        },
+        "includeInFitToBounds": true,
+        "disableTooltips": false
+      },
+      {
+        "id": "kismet-layer-5",
+        "label": "Other geospatial events - COLLECTOR position (alerts, messages, radiation, system)",
+        "sourceDescriptor": {
+          "type": "ES_SEARCH",
+          "id": "kismet-source-5",
+          "geoField": "geo.location",
+          "filterByMapBounds": true,
+          "scalingType": "MVT",
+          "tooltipProperties": [
+            "@timestamp",
+            "kismet.record",
+            "message",
+            "kismet.alert.header",
+            "kismet.alert.class",
+            "event.dataset",
+            "kismet.source.file",
+            "geo.location_type"
+          ],
+          "sortField": "@timestamp",
+          "sortOrder": "desc",
+          "topHitsSplitField": "",
+          "topHitsSize": 1,
+          "applyGlobalQuery": true,
+          "applyGlobalTime": true,
+          "applyForceRefresh": true,
+          "indexPatternRefName": "layer_5_source_index_pattern"
+        },
+        "type": "MVT_VECTOR",
+        "visible": false,
+        "alpha": 0.75,
+        "minZoom": 0,
+        "maxZoom": 24,
+        "joins": [],
+        "query": {
+          "query": "kismet.record : (\"alert\" or \"message\" or \"snapshot.radiation\" or \"snapshot.system\")",
+          "language": "kuery"
+        },
+        "style": {
+          "type": "VECTOR",
+          "properties": {
+            "icon": {
+              "type": "STATIC",
+              "options": {
+                "value": "marker"
+              }
+            },
+            "fillColor": {
+              "type": "DYNAMIC",
+              "options": {
+                "colorCategory": "palette_0",
+                "field": {
+                  "name": "kismet.record",
+                  "origin": "source"
+                },
+                "fieldMetaOptions": {
+                  "isEnabled": true,
+                  "sigma": 3
+                },
+                "type": "CATEGORICAL"
+              }
+            },
+            "lineColor": {
+              "type": "STATIC",
+              "options": {
+                "color": "#343741"
+              }
+            },
+            "lineWidth": {
+              "type": "STATIC",
+              "options": {
+                "size": 1
+              }
+            },
+            "iconSize": {
+              "type": "STATIC",
+              "options": {
+                "size": 6
+              }
+            },
+            "iconOrientation": {
+              "type": "STATIC",
+              "options": {
+                "orientation": 0
+              }
+            },
+            "labelText": {
+              "type": "STATIC",
+              "options": {
+                "value": ""
+              }
+            },
+            "labelColor": {
+              "type": "STATIC",
+              "options": {
+                "color": "#000000"
+              }
+            },
+            "labelSize": {
+              "type": "STATIC",
+              "options": {
+                "size": 14
+              }
+            },
+            "labelBorderColor": {
+              "type": "STATIC",
+              "options": {
+                "color": "#FFFFFF"
+              }
+            },
+            "symbolizeAs": {
+              "options": {
+                "value": "circle"
+              }
+            },
+            "labelBorderSize": {
+              "options": {
+                "size": "SMALL"
+              }
+            }
+          },
+          "isTimeAware": true
+        },
+        "includeInFitToBounds": true,
+        "disableTooltips": false
+      },
+      {
+        "id": "kismet-layer-9",
+        "label": "Wi-Fi devices (icons) - OBSERVATION CENTROID, not the transmitter location",
+        "sourceDescriptor": {
+          "type": "ES_SEARCH",
+          "id": "kismet-source-9",
+          "geoField": "geo.location",
+          "filterByMapBounds": true,
+          "scalingType": "MVT",
+          "tooltipProperties": [
+            "@timestamp",
+            "kismet.device.type",
+            "wifi.ssid",
+            "wifi.bssid",
+            "wifi.mac",
+            "kismet.device_key",
+            "wifi.crypt",
+            "wifi.channel",
+            "wifi.band",
+            "kismet.device.strongest_signal",
+            "kismet.device.packets_total",
+            "kismet.source.file",
+            "geo.location_type"
+          ],
+          "sortField": "@timestamp",
+          "sortOrder": "desc",
+          "topHitsSplitField": "",
+          "topHitsSize": 1,
+          "applyGlobalQuery": true,
+          "applyGlobalTime": true,
+          "applyForceRefresh": true,
+          "indexPatternRefName": "layer_9_source_index_pattern"
+        },
+        "type": "MVT_VECTOR",
+        "visible": false,
+        "alpha": 1,
+        "minZoom": 15,
+        "maxZoom": 24,
+        "joins": [],
+        "query": {
+          "query": "kismet.record : \"device\" and geo.location_type : \"observer_centroid\"",
+          "language": "kuery"
+        },
+        "style": {
+          "type": "VECTOR",
+          "properties": {
+            "icon": {
+              "type": "STATIC",
+              "options": {
+                "value": "marker"
+              }
+            },
+            "fillColor": {
+              "type": "STATIC",
+              "options": {
+                "color": "#0077CC"
+              }
+            },
+            "lineColor": {
+              "type": "STATIC",
+              "options": {
+                "color": "#FFFFFF"
+              }
+            },
+            "lineWidth": {
+              "type": "STATIC",
+              "options": {
+                "size": 1
+              }
+            },
+            "iconSize": {
+              "type": "STATIC",
+              "options": {
+                "size": 12
+              }
+            },
+            "iconOrientation": {
+              "type": "STATIC",
+              "options": {
+                "orientation": 0
+              }
+            },
+            "labelText": {
+              "type": "STATIC",
+              "options": {
+                "value": ""
+              }
+            },
+            "labelColor": {
+              "type": "STATIC",
+              "options": {
+                "color": "#000000"
+              }
+            },
+            "labelSize": {
+              "type": "STATIC",
+              "options": {
+                "size": 14
+              }
+            },
+            "labelBorderColor": {
+              "type": "STATIC",
+              "options": {
+                "color": "#FFFFFF"
+              }
+            },
+            "symbolizeAs": {
+              "options": {
+                "value": "icon"
+              }
+            },
+            "labelBorderSize": {
+              "options": {
+                "size": "SMALL"
+              }
+            }
+          },
+          "isTimeAware": true
+        },
+        "includeInFitToBounds": true,
+        "disableTooltips": false
+      },
+      {
+        "id": "kismet-layer-10",
+        "label": "Aircraft (icons) - ADS-B REPORTED position, one per aircraft (emitter_reported)",
+        "sourceDescriptor": {
+          "type": "ES_SEARCH",
+          "id": "kismet-source-10",
+          "geoField": "geo.location",
+          "filterByMapBounds": true,
+          "scalingType": "MVT",
+          "tooltipProperties": [
+            "@timestamp",
+            "aircraft.icao",
+            "aircraft.callsign",
+            "aircraft.registration",
+            "aircraft.type",
+            "aircraft.owner",
+            "aircraft.altitude",
+            "aircraft.speed",
+            "aircraft.heading",
+            "kismet.record",
+            "kismet.datasource.name",
+            "kismet.source.file",
+            "geo.location_type"
+          ],
+          "sortField": "@timestamp",
+          "sortOrder": "desc",
+          "topHitsSplitField": "",
+          "topHitsSize": 1,
+          "applyGlobalQuery": true,
+          "applyGlobalTime": true,
+          "applyForceRefresh": true,
+          "indexPatternRefName": "layer_10_source_index_pattern"
+        },
+        "type": "MVT_VECTOR",
+        "visible": true,
+        "alpha": 1,
+        "minZoom": 11,
+        "maxZoom": 24,
+        "joins": [],
+        "query": {
+          "query": "kismet.record : \"device\" and geo.location_type : \"emitter_reported\"",
+          "language": "kuery"
+        },
+        "style": {
+          "type": "VECTOR",
+          "properties": {
+            "icon": {
+              "type": "STATIC",
+              "options": {
+                "value": "airport"
+              }
+            },
+            "fillColor": {
+              "type": "STATIC",
+              "options": {
+                "color": "#BD271E"
+              }
+            },
+            "lineColor": {
+              "type": "STATIC",
+              "options": {
+                "color": "#FFFFFF"
+              }
+            },
+            "lineWidth": {
+              "type": "STATIC",
+              "options": {
+                "size": 1
+              }
+            },
+            "iconSize": {
+              "type": "STATIC",
+              "options": {
+                "size": 14
+              }
+            },
+            "iconOrientation": {
+              "type": "STATIC",
+              "options": {
+                "orientation": 0
+              }
+            },
+            "labelText": {
+              "type": "STATIC",
+              "options": {
+                "value": ""
+              }
+            },
+            "labelColor": {
+              "type": "STATIC",
+              "options": {
+                "color": "#000000"
+              }
+            },
+            "labelSize": {
+              "type": "STATIC",
+              "options": {
+                "size": 14
+              }
+            },
+            "labelBorderColor": {
+              "type": "STATIC",
+              "options": {
+                "color": "#FFFFFF"
+              }
+            },
+            "symbolizeAs": {
+              "options": {
+                "value": "icon"
+              }
+            },
+            "labelBorderSize": {
+              "options": {
+                "size": "SMALL"
+              }
+            }
+          },
+          "isTimeAware": true
+        },
+        "includeInFitToBounds": true,
+        "disableTooltips": false
+      }
+    ],
+    "mapStateJSON": {
+      "zoom": 2.0,
+      "center": {
+        "lon": 0,
+        "lat": 20
+      },
+      "timeFilters": {
+        "from": "now-2y",
+        "to": "now"
+      },
+      "refreshConfig": {
+        "isPaused": true,
+        "interval": 0
+      },
+      "query": {
+        "query": "",
+        "language": "kuery"
+      },
+      "filters": [],
+      "settings": {
+        "autoFitToDataBounds": false,
+        "backgroundColor": "#ffffff",
+        "disableInteractive": false,
+        "disableTooltipControl": false,
+        "hideToolbarOverlay": false,
+        "hideLayerControl": false,
+        "hideViewControl": false,
+        "initialLocation": "LAST_SAVED_LOCATION",
+        "fixedLocation": {
+          "lat": 20,
+          "lon": 0,
+          "zoom": 2
+        },
+        "browserLocation": {
+          "zoom": 2
+        },
+        "maxZoom": 24,
+        "minZoom": 0,
+        "showScaleControl": true,
+        "showSpatialFilters": true,
+        "showTimesliderToggleButton": true,
+        "spatialFiltersAlpa": 0.3,
+        "spatialFiltersFillColor": "#DA8B45",
+        "spatialFiltersLineColor": "#DA8B45"
+      }
+    },
+    "uiStateJSON": {
+      "isLayerTOCOpen": true,
+      "openTOCDetails": []
+    }
+  },
+  "references": [
+    {
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview",
+      "name": "layer_1_source_index_pattern"
+    },
+    {
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview",
+      "name": "layer_2_source_index_pattern"
+    },
+    {
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview",
+      "name": "layer_3_source_index_pattern"
+    },
+    {
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview",
+      "name": "layer_4_source_index_pattern"
+    },
+    {
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview",
+      "name": "layer_5_source_index_pattern"
+    },
+    {
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview",
+      "name": "layer_6_source_index_pattern"
+    },
+    {
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview",
+      "name": "layer_7_source_index_pattern"
+    },
+    {
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview",
+      "name": "layer_8_source_index_pattern"
+    },
+    {
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview",
+      "name": "layer_9_source_index_pattern"
+    },
+    {
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview",
+      "name": "layer_10_source_index_pattern"
+    }
+  ]
+}

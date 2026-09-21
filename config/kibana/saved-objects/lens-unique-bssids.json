@@ -1,0 +1,60 @@
+{
+  "id": "kismet-cartographer-lens-unique-bssids",
+  "type": "lens",
+  "attributes": {
+    "title": "Kismet Cartographer - Unique BSSIDs",
+    "description": "Distinct wifi.bssid seen in Wi-Fi observations.",
+    "visualizationType": "lnsMetric",
+    "state": {
+      "datasourceStates": {
+        "formBased": {
+          "layers": {
+            "layer1": {
+              "columnOrder": [
+                "metric"
+              ],
+              "columns": {
+                "metric": {
+                  "label": "Unique BSSIDs",
+                  "customLabel": true,
+                  "dataType": "number",
+                  "operationType": "unique_count",
+                  "isBucketed": false,
+                  "scale": "ratio",
+                  "sourceField": "wifi.bssid",
+                  "params": {
+                    "emptyAsNull": false
+                  }
+                }
+              },
+              "incompleteColumns": {},
+              "sampling": 1
+            }
+          }
+        }
+      },
+      "filters": [],
+      "query": {
+        "query": "kismet.record : \"wifi.packet\"",
+        "language": "kuery"
+      },
+      "visualization": {
+        "layerId": "layer1",
+        "layerType": "data",
+        "metricAccessor": "metric",
+        "color": "#F1F4FA",
+        "showBar": false,
+        "subtitle": "distinct wifi.bssid"
+      },
+      "adHocDataViews": {},
+      "internalReferences": []
+    }
+  },
+  "references": [
+    {
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview",
+      "name": "indexpattern-datasource-layer-layer1"
+    }
+  ]
+}

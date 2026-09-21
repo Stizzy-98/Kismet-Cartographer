@@ -1,0 +1,145 @@
+{
+  "id": "kismet-cartographer-lens-hw-security-by-brand",
+  "type": "lens",
+  "attributes": {
+    "title": "Kismet Cartographer - Version - security of each brand's access points",
+    "description": "One bar per brand (top 10 by access points). The bar is split by security version, so you can see what share of a brand's gear is WPA2, WPA3, Open and so on.",
+    "visualizationType": "lnsXY",
+    "state": {
+      "datasourceStates": {
+        "formBased": {
+          "layers": {
+            "layer1": {
+              "columnOrder": [
+                "brand",
+                "split",
+                "metric"
+              ],
+              "columns": {
+                "metric": {
+                  "label": "Access points",
+                  "customLabel": true,
+                  "dataType": "number",
+                  "operationType": "count",
+                  "isBucketed": false,
+                  "scale": "ratio",
+                  "sourceField": "___records___",
+                  "params": {
+                    "emptyAsNull": false
+                  }
+                },
+                "brand": {
+                  "label": "Brand",
+                  "customLabel": true,
+                  "dataType": "string",
+                  "operationType": "terms",
+                  "scale": "ordinal",
+                  "sourceField": "device.manufacturer",
+                  "isBucketed": true,
+                  "params": {
+                    "size": 10,
+                    "orderBy": {
+                      "type": "column",
+                      "columnId": "metric"
+                    },
+                    "orderDirection": "desc",
+                    "otherBucket": false,
+                    "missingBucket": false,
+                    "parentFormat": {
+                      "id": "terms"
+                    },
+                    "include": [],
+                    "exclude": [],
+                    "includeIsRegex": false,
+                    "excludeIsRegex": false
+                  }
+                },
+                "split": {
+                  "label": "Security version",
+                  "customLabel": true,
+                  "dataType": "string",
+                  "operationType": "terms",
+                  "scale": "ordinal",
+                  "sourceField": "wifi.security",
+                  "isBucketed": true,
+                  "params": {
+                    "size": 8,
+                    "orderBy": {
+                      "type": "column",
+                      "columnId": "metric"
+                    },
+                    "orderDirection": "desc",
+                    "otherBucket": false,
+                    "missingBucket": false,
+                    "parentFormat": {
+                      "id": "terms"
+                    },
+                    "include": [],
+                    "exclude": [],
+                    "includeIsRegex": false,
+                    "excludeIsRegex": false
+                  }
+                }
+              },
+              "incompleteColumns": {},
+              "sampling": 1
+            }
+          }
+        }
+      },
+      "filters": [],
+      "query": {
+        "query": "kismet.record : \"device\" and kismet.phy : \"IEEE802.11\" and wifi.security : * and device.manufacturer : *",
+        "language": "kuery"
+      },
+      "visualization": {
+        "legend": {
+          "isVisible": true,
+          "position": "right"
+        },
+        "valueLabels": "hide",
+        "fittingFunction": "None",
+        "axisTitlesVisibilitySettings": {
+          "x": false,
+          "yLeft": false,
+          "yRight": false
+        },
+        "tickLabelsVisibilitySettings": {
+          "x": true,
+          "yLeft": true,
+          "yRight": true
+        },
+        "gridlinesVisibilitySettings": {
+          "x": false,
+          "yLeft": true,
+          "yRight": false
+        },
+        "preferredSeriesType": "bar_horizontal_percentage_stacked",
+        "layers": [
+          {
+            "layerId": "layer1",
+            "accessors": [
+              "metric"
+            ],
+            "position": "top",
+            "seriesType": "bar_horizontal_percentage_stacked",
+            "showGridlines": false,
+            "layerType": "data",
+            "xAccessor": "brand",
+            "colorMapping": null,
+            "splitAccessor": "split"
+          }
+        ]
+      },
+      "adHocDataViews": {},
+      "internalReferences": []
+    }
+  },
+  "references": [
+    {
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview",
+      "name": "indexpattern-datasource-layer-layer1"
+    }
+  ]
+}

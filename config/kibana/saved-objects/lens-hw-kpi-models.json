@@ -1,0 +1,60 @@
+{
+  "id": "kismet-cartographer-lens-hw-kpi-models",
+  "type": "lens",
+  "attributes": {
+    "title": "Kismet Cartographer - Models identified",
+    "description": "Distinct model names Wi-Fi devices announced (WPS).",
+    "visualizationType": "lnsMetric",
+    "state": {
+      "datasourceStates": {
+        "formBased": {
+          "layers": {
+            "layer1": {
+              "columnOrder": [
+                "metric"
+              ],
+              "columns": {
+                "metric": {
+                  "label": "Models",
+                  "customLabel": true,
+                  "dataType": "number",
+                  "operationType": "unique_count",
+                  "isBucketed": false,
+                  "scale": "ratio",
+                  "sourceField": "device.model.name",
+                  "params": {
+                    "emptyAsNull": false
+                  }
+                }
+              },
+              "incompleteColumns": {},
+              "sampling": 1
+            }
+          }
+        }
+      },
+      "filters": [],
+      "query": {
+        "query": "kismet.record : \"device\" and kismet.phy : \"IEEE802.11\"",
+        "language": "kuery"
+      },
+      "visualization": {
+        "layerId": "layer1",
+        "layerType": "data",
+        "metricAccessor": "metric",
+        "color": "#F1F4FA",
+        "showBar": false,
+        "subtitle": "distinct model names"
+      },
+      "adHocDataViews": {},
+      "internalReferences": []
+    }
+  },
+  "references": [
+    {
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview",
+      "name": "indexpattern-datasource-layer-layer1"
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "id": "kismet-cartographer-recent-observations",
+  "type": "search",
+  "attributes": {
+    "title": "Kismet Cartographer - Recent observations",
+    "description": "Newest Wi-Fi packets and ADS-B frames, newest first.",
+    "columns": [
+      "kismet.record",
+      "kismet.phy",
+      "wifi.ssid",
+      "wifi.bssid",
+      "wifi.mac",
+      "wifi.rssi",
+      "wifi.channel",
+      "wifi.band",
+      "aircraft.icao",
+      "aircraft.callsign",
+      "kismet.datasource.name",
+      "kismet.source.file"
+    ],
+    "sort": [
+      [
+        "@timestamp",
+        "desc"
+      ]
+    ],
+    "grid": {},
+    "hideChart": false,
+    "isTextBasedQuery": false,
+    "timeRestore": false,
+    "kibanaSavedObjectMeta": {
+      "searchSourceJSON": {
+        "query": {
+          "query": "kismet.record : (\"wifi.packet\" or \"adsb.frame\")",
+          "language": "kuery"
+        },
+        "filter": [],
+        "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index"
+      }
+    }
+  },
+  "references": [
+    {
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview",
+      "name": "kibanaSavedObjectMeta.searchSourceJSON.index"
+    }
+  ]
+}

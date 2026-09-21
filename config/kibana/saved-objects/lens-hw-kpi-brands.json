@@ -1,0 +1,60 @@
+{
+  "id": "kismet-cartographer-lens-hw-kpi-brands",
+  "type": "lens",
+  "attributes": {
+    "title": "Kismet Cartographer - Brands seen",
+    "description": "Distinct brands (cleaned manufacturer) among Wi-Fi devices.",
+    "visualizationType": "lnsMetric",
+    "state": {
+      "datasourceStates": {
+        "formBased": {
+          "layers": {
+            "layer1": {
+              "columnOrder": [
+                "metric"
+              ],
+              "columns": {
+                "metric": {
+                  "label": "Brands",
+                  "customLabel": true,
+                  "dataType": "number",
+                  "operationType": "unique_count",
+                  "isBucketed": false,
+                  "scale": "ratio",
+                  "sourceField": "device.manufacturer",
+                  "params": {
+                    "emptyAsNull": false
+                  }
+                }
+              },
+              "incompleteColumns": {},
+              "sampling": 1
+            }
+          }
+        }
+      },
+      "filters": [],
+      "query": {
+        "query": "kismet.record : \"device\" and kismet.phy : \"IEEE802.11\"",
+        "language": "kuery"
+      },
+      "visualization": {
+        "layerId": "layer1",
+        "layerType": "data",
+        "metricAccessor": "metric",
+        "color": "#F1F4FA",
+        "showBar": false,
+        "subtitle": "distinct brands"
+      },
+      "adHocDataViews": {},
+      "internalReferences": []
+    }
+  },
+  "references": [
+    {
+      "type": "index-pattern",
+      "id": "kismet-cartographer-dataview",
+      "name": "indexpattern-datasource-layer-layer1"
+    }
+  ]
+}

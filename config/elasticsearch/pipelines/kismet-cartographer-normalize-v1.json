@@ -1,0 +1,39 @@
+{
+  "description": "Kismet Cartographer: last-line-of-defence normalisation. Stamps event.ingested, strips any geo point that is out of range or (0,0), and drops a 0 RSSI (Kismet's 'no signal' sentinel). The ingester already does this; the pipeline protects the index from any other writer.",
+  "version": 1,
+  "processors": [
+    {
+      "set": {
+        "field": "event.ingested",
+        "value": "{{{_ingest.timestamp}}}"
+      }
+    },
+    {
+      "script": {
+        "description": "geo.location / geo.peak_signal_location must be a real point",
+        "lang": "painless",
+        "source": "if (ctx.geo == null) { return; }\nString[] fields = new String[] {'location', 'peak_signal_location'};\nfor (int i = 0; i < fields.length; i++) {\n  def p = ctx.geo.get(fields[i]);\n  if (p == null) { continue; }\n  boolean valid = false;\n  if (p instanceof Map) {\n    def a = p.get('lat'); def o = p.get('lon');\n    if (a instanceof Number && o instanceof Number) {\n      double lat = a.doubleValue(); double lon = o.doubleValue();\n      valid = lat >= -90.0 && lat <= 90.0 && lon >= -180.0 && lon <= 180.0 && !(lat == 0.0 && lon == 0.0);\n    }\n  }\n  if (!valid) {\n    ctx.geo.remove(fields[i]);\n    if (fields[i] == 'location') { ctx.geo.remove('location_type'); ctx.geo.put('status', 'invalid'); }\n  }\n}"
+      }
+    },
+    {
+      "script": {
+        "description": "0 dBm RSSI is Kismet's absent-signal sentinel",
+        "lang": "painless",
+        "source": "if (ctx.wifi != null) { def r = ctx.wifi.get('rssi'); if (r instanceof Number && r.doubleValue() == 0.0) { ctx.wifi.remove('rssi'); } }"
+      }
+    }
+  ],
+  "on_failure": [
+    {
+      "set": {
+        "field": "kismet.parse_error",
+        "value": "pipeline: {{{_ingest.on_failure_message}}}"
+      }
+    }
+  ],
+  "_meta": {
+    "project": "kismet-cartographer",
+    "managed_by": "kismet-cartographer installer",
+    "docs": "docs/data-model.md"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "index_patterns": [
+    "kismet-cartographer-track-*"
+  ],
+  "priority": 500,
+  "composed_of": [
+    "kismet-cartographer-settings-v1",
+    "kismet-cartographer-mappings-common-v1"
+  ],
+  "version": 1,
+  "_meta": {
+    "project": "kismet-cartographer",
+    "managed_by": "kismet-cartographer installer",
+    "docs": "docs/data-model.md",
+    "family": "track",
+    "description": "The collector's own GPS track (GPS snapshots) and position-only radiation pings."
+  }
+}

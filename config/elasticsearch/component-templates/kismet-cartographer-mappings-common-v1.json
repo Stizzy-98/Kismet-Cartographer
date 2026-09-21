@@ -1,0 +1,520 @@
+{
+  "template": {
+    "mappings": {
+      "dynamic": false,
+      "properties": {
+        "@timestamp": {
+          "type": "date"
+        },
+        "ecs": {
+          "properties": {
+            "version": {
+              "type": "keyword"
+            }
+          }
+        },
+        "event": {
+          "properties": {
+            "kind": {
+              "type": "keyword"
+            },
+            "module": {
+              "type": "keyword"
+            },
+            "dataset": {
+              "type": "keyword"
+            },
+            "category": {
+              "type": "keyword"
+            },
+            "type": {
+              "type": "keyword"
+            },
+            "severity": {
+              "type": "long"
+            },
+            "start": {
+              "type": "date"
+            },
+            "end": {
+              "type": "date"
+            },
+            "ingested": {
+              "type": "date"
+            }
+          }
+        },
+        "message": {
+          "type": "text"
+        },
+        "log": {
+          "properties": {
+            "level": {
+              "type": "keyword"
+            }
+          }
+        },
+        "observer": {
+          "properties": {
+            "name": {
+              "type": "keyword"
+            },
+            "type": {
+              "type": "keyword"
+            }
+          }
+        },
+        "source": {
+          "properties": {
+            "mac": {
+              "type": "keyword"
+            }
+          }
+        },
+        "destination": {
+          "properties": {
+            "mac": {
+              "type": "keyword"
+            }
+          }
+        },
+        "geo": {
+          "properties": {
+            "location": {
+              "type": "geo_point"
+            },
+            "peak_signal_location": {
+              "type": "geo_point"
+            },
+            "location_type": {
+              "type": "keyword"
+            },
+            "status": {
+              "type": "keyword"
+            },
+            "reason": {
+              "type": "keyword"
+            },
+            "rejected": {
+              "type": "object",
+              "enabled": false
+            }
+          }
+        },
+        "gps": {
+          "properties": {
+            "altitude": {
+              "type": "float"
+            },
+            "speed": {
+              "type": "float"
+            },
+            "heading": {
+              "type": "float"
+            },
+            "fix": {
+              "type": "integer"
+            },
+            "name": {
+              "type": "keyword"
+            }
+          }
+        },
+        "wifi": {
+          "properties": {
+            "mac": {
+              "type": "keyword"
+            },
+            "bssid": {
+              "type": "keyword"
+            },
+            "ssid": {
+              "type": "keyword"
+            },
+            "ssids": {
+              "type": "keyword"
+            },
+            "probed_ssids": {
+              "type": "keyword"
+            },
+            "ssid_hidden": {
+              "type": "boolean"
+            },
+            "channel": {
+              "type": "keyword"
+            },
+            "frequency": {
+              "type": "float"
+            },
+            "band": {
+              "type": "keyword"
+            },
+            "rssi": {
+              "type": "float"
+            },
+            "phy": {
+              "type": "keyword"
+            },
+            "crypt": {
+              "type": "keyword"
+            },
+            "transmitter_mac": {
+              "type": "keyword"
+            },
+            "num_associated_clients": {
+              "type": "integer"
+            },
+            "security": {
+              "type": "keyword"
+            },
+            "auth": {
+              "type": "keyword"
+            },
+            "channel_width": {
+              "type": "keyword"
+            },
+            "wps": {
+              "properties": {
+                "version": {
+                  "type": "keyword"
+                },
+                "device_name": {
+                  "type": "keyword"
+                }
+              }
+            }
+          }
+        },
+        "device": {
+          "properties": {
+            "manufacturer": {
+              "type": "keyword"
+            },
+            "model": {
+              "properties": {
+                "name": {
+                  "type": "keyword"
+                },
+                "identifier": {
+                  "type": "keyword"
+                }
+              }
+            }
+          }
+        },
+        "aircraft": {
+          "properties": {
+            "icao": {
+              "type": "keyword"
+            },
+            "callsign": {
+              "type": "keyword"
+            },
+            "registration": {
+              "type": "keyword"
+            },
+            "type": {
+              "type": "keyword"
+            },
+            "model": {
+              "type": "keyword"
+            },
+            "owner": {
+              "type": "keyword"
+            },
+            "category": {
+              "type": "keyword"
+            },
+            "altitude": {
+              "type": "float"
+            },
+            "speed": {
+              "type": "float"
+            },
+            "heading": {
+              "type": "float"
+            },
+            "rejected": {
+              "type": "object",
+              "enabled": false
+            }
+          }
+        },
+        "adsb": {
+          "properties": {
+            "frame": {
+              "type": "keyword"
+            }
+          }
+        },
+        "kismet": {
+          "properties": {
+            "record": {
+              "type": "keyword"
+            },
+            "version": {
+              "type": "keyword"
+            },
+            "db_version": {
+              "type": "integer"
+            },
+            "derived": {
+              "type": "keyword"
+            },
+            "parse_error": {
+              "type": "keyword"
+            },
+            "device_key": {
+              "type": "keyword"
+            },
+            "devmac": {
+              "type": "keyword"
+            },
+            "phy": {
+              "type": "keyword"
+            },
+            "ts": {
+              "properties": {
+                "sec": {
+                  "type": "long"
+                },
+                "usec": {
+                  "type": "integer"
+                }
+              }
+            },
+            "source": {
+              "properties": {
+                "file": {
+                  "type": "keyword"
+                },
+                "file_hash": {
+                  "type": "keyword"
+                },
+                "file_size": {
+                  "type": "long"
+                },
+                "table": {
+                  "type": "keyword"
+                },
+                "rowid": {
+                  "type": "long"
+                },
+                "first_ts": {
+                  "type": "date"
+                },
+                "last_ts": {
+                  "type": "date"
+                }
+              }
+            },
+            "ingest": {
+              "properties": {
+                "run_id": {
+                  "type": "keyword"
+                },
+                "schema_version": {
+                  "type": "integer"
+                },
+                "tool_version": {
+                  "type": "keyword"
+                },
+                "status": {
+                  "type": "keyword"
+                },
+                "started": {
+                  "type": "date"
+                },
+                "finished": {
+                  "type": "date"
+                },
+                "duration_s": {
+                  "type": "float"
+                },
+                "docs_built": {
+                  "type": "long"
+                },
+                "docs_indexed": {
+                  "type": "long"
+                },
+                "docs_failed": {
+                  "type": "long"
+                },
+                "parse_errors": {
+                  "type": "long"
+                },
+                "docs_without_gps": {
+                  "type": "long"
+                },
+                "options": {
+                  "type": "object",
+                  "enabled": false
+                },
+                "tables": {
+                  "type": "object",
+                  "enabled": false
+                }
+              }
+            },
+            "datasource": {
+              "properties": {
+                "uuid": {
+                  "type": "keyword"
+                },
+                "name": {
+                  "type": "keyword"
+                },
+                "type": {
+                  "type": "keyword"
+                },
+                "interface": {
+                  "type": "keyword"
+                },
+                "definition": {
+                  "type": "keyword"
+                },
+                "hardware": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "device": {
+              "properties": {
+                "type": {
+                  "type": "keyword"
+                },
+                "first_seen": {
+                  "type": "date"
+                },
+                "last_seen": {
+                  "type": "date"
+                },
+                "name": {
+                  "type": "keyword"
+                },
+                "commonname": {
+                  "type": "keyword"
+                },
+                "manufacturer": {
+                  "type": "keyword"
+                },
+                "strongest_signal": {
+                  "type": "float"
+                },
+                "bytes_data": {
+                  "type": "long"
+                },
+                "packets_total": {
+                  "type": "long"
+                },
+                "bounds": {
+                  "properties": {
+                    "min_lat": {
+                      "type": "float"
+                    },
+                    "min_lon": {
+                      "type": "float"
+                    },
+                    "max_lat": {
+                      "type": "float"
+                    },
+                    "max_lon": {
+                      "type": "float"
+                    }
+                  }
+                }
+              }
+            },
+            "packet": {
+              "properties": {
+                "len": {
+                  "type": "integer"
+                },
+                "full_len": {
+                  "type": "integer"
+                },
+                "hash": {
+                  "type": "long"
+                },
+                "packet_id": {
+                  "type": "long"
+                },
+                "dlt": {
+                  "type": "integer"
+                },
+                "error": {
+                  "type": "boolean"
+                },
+                "tags": {
+                  "type": "keyword"
+                },
+                "datarate": {
+                  "type": "float"
+                },
+                "signal_raw": {
+                  "type": "integer"
+                },
+                "frequency_khz": {
+                  "type": "float"
+                },
+                "devkey_raw": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "alert": {
+              "properties": {
+                "header": {
+                  "type": "keyword"
+                },
+                "class": {
+                  "type": "keyword"
+                },
+                "severity": {
+                  "type": "integer"
+                },
+                "hash": {
+                  "type": "long"
+                },
+                "phy_id": {
+                  "type": "long"
+                },
+                "channel": {
+                  "type": "keyword"
+                },
+                "device_key": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "snapshot": {
+              "properties": {
+                "type": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "data": {
+              "properties": {
+                "type": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "raw": {
+              "type": "object",
+              "enabled": false
+            }
+          }
+        }
+      }
+    }
+  },
+  "version": 4,
+  "_meta": {
+    "project": "kismet-cartographer",
+    "managed_by": "kismet-cartographer installer",
+    "docs": "docs/data-model.md",
+    "description": "Field mappings shared by every kismet-cartographer-* index. dynamic=false: unknown fields are kept in _source but never create mappings."
+  }
+}

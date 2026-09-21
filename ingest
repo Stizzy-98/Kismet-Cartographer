@@ -1,0 +1,137 @@
+#!/usr/bin/env python3
+"""ingest - load your Kismet captures into the stack you set up with ./install.
+
+  ./ingest                       # everything in the wardrives/ folder
+  ./ingest path/to/file.kismet   # one file, or another folder
+  ./ingest --check               # only test the connection, permissions and list what would be loaded
+
+Run it whenever you have new captures: put the .kismet files in wardrives/ and run it again. Files that were already
+loaded are skipped, so it is quick and safe to repeat (use --reload to process them again anyway).
+
+Connection settings: pass the same flags you gave ./install, or run ./install once with --save-config and then just
+type ./ingest. Exit codes: 0 ok (also when there is nothing to load yet), 1 a file failed, 2 usage/config problem,
+3 cannot connect/authenticate/not permitted.
+"""
+import sys
+
+if sys.version_info < (3, 9):
+    sys.exit("error: Python 3.9 or newer is required (found %s)" % sys.version.split()[0])
+
+import argparse
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent
+sys.path.insert(0, str(ROOT))
+
+from kismet_cartographer.cli_common import (  # noqa: E402
+    WARDRIVES, Stop, capture_files, child_env, connection_hint, ok, run_step, say, warn)
+from kismet_cartographer.config import add_connection_args, load_config  # noqa: E402
+from kismet_cartographer.constants import FAMILIES  # noqa: E402
+from kismet_cartographer.esclient import (  # noqa: E402
+    ConnectionFailure, EsError, client_from_config, kibana_space_path, preflight as alias_preflight)
+
+INGEST_PRIVS = ["create_index", "create_doc", "index", "write", "read", "view_index_metadata"]
+INDEX_PATTERN = "kismet-cartographer-*"
+
+
+def check_stack(cfg) -> None:
+    """Connection, key and permissions for loading data. Raises Stop with a fix."""
+    if not cfg.elastic_url:
+        raise Stop(2, "no Elasticsearch URL",
+                   "Pass --es-url (or --host), or run ./install once with --save-config to remember it.")
+    if not cfg.api_key:
+        raise Stop(2, "no API key", "Pass --api-key-file <file> (or set ELASTIC_API_KEY), "
+                                    "or run ./install once with --save-config and --api-key-file to remember the file.")
+    if cfg.elastic_url.startswith("http://"):
+        warn("the connection is NOT encrypted (http://): the API key and your data cross the network in clear text")
+    es = client_from_config(cfg, timeout=30.0)
+    es.max_retries = 1
+    try:
+        version, missing = alias_preflight(es, list(FAMILIES))
+    except ConnectionFailure as e:
+        raise Stop(3, f"cannot reach Elasticsearch at {cfg.elastic_url}: {e}", connection_hint(str(e), cfg.elastic_url))
+    except EsError as e:
+        if e.status == 401:
+            raise Stop(3, "Elasticsearch rejected the API key (HTTP 401)",
+                       "The key is wrong, revoked or expired. Create a new one: ./install --print-api-key-request")
+        raise Stop(3, f"Elasticsearch answered: {e}", "Check the URL and that the key may read kismet-cartographer-* indices.")
+    ok(f"Elasticsearch {version or '(version hidden by the key)'} at {cfg.elastic_url}")
+    try:
+        me = es.get("/_security/_authenticate")
+        ok(f"authenticated as '{me.get('username', '?')}'")
+    except EsError:
+        pass
+    if missing:
+        raise Stop(2, "the Kismet Cartographer indices do not exist yet (" + ", ".join(missing) + ")",
+                   "Run ./install first; it creates them.")
+    try:
+        have = es.post("/_security/user/_has_privileges",
+                       {"index": [{"names": [INDEX_PATTERN], "privileges": INGEST_PRIVS}]})
+        lacking = [p for pats in have.get("index", {}).values() for p, v in pats.items() if not v]
+        if lacking:
+            raise Stop(3, "the API key may not load data: missing index privileges " + ", ".join(lacking),
+                       "Create a key with ./install --print-api-key-request (or the narrower ingest key in docs/security.md).")
+    except EsError:
+        pass  # a key that cannot even ask is rejected by the real write below, with the real message
+    ok("the key may write to the Kismet Cartographer indices")
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("path", nargs="?", default=str(WARDRIVES),
+                    help=".kismet file or folder (default: the wardrives/ folder of this project)")
+    add_connection_args(ap, kibana=True)
+    ap.add_argument("--check", action="store_true", help="test the connection and permissions and list the files, then stop")
+    ap.add_argument("--reload", action="store_true", help="process files again even if they were already loaded")
+    ap.add_argument("--validate", action="store_true", help="afterwards compare what was stored with the source files")
+    ap.add_argument("--workers", type=int, default=2, help="parallel bulk requests (default 2; be gentle on shared clusters)")
+    args = ap.parse_args()
+
+    say("Kismet Cartographer - loading captures\n")
+    files = capture_files(args.path)
+    shown = args.path if Path(args.path) != WARDRIVES else "wardrives/"
+    if not files:
+        say(f"  No .kismet files found in {shown} yet.")
+        say("  Nothing is wrong: copy your Kismet captures (Kismet-YYYYMMDD-HH-MM-SS-1.kismet ...) into the wardrives/ folder")
+        say("  and run ./ingest again. (No captures to try it with? python3 scripts/make_sample_capture.py writes an invented one.)")
+        return 0
+    size = sum(f.stat().st_size for f in files) / 1e6
+    say(f"  {len(files)} capture file(s) in {shown} ({size:,.0f} MB)")
+
+    try:
+        cfg = load_config(args=args)
+    except SystemExit as e:
+        say(str(e))
+        return 2
+    try:
+        say("\nChecking your stack")
+        check_stack(cfg)
+        if args.check:
+            say("\nAll checks passed. Run ./ingest without --check to load the files.")
+            return 0
+        env = child_env(cfg)
+        extra = [str(args.path), "--allow-parse-errors", "--workers", str(args.workers)]
+        if not args.reload:
+            extra.append("--skip-complete")
+        run_step(f"Loading {shown}", "ingest_kismet.py", extra, env, False)
+        if args.validate:
+            run_step("Validating the load", "validate_elastic.py", ["--source", str(args.path)], env, False)
+    except Stop as s:
+        say(f"\n  [FAIL] {s.msg}")
+        if s.fix:
+            say(f"         Fix: {s.fix}")
+        return s.code
+    except KeyboardInterrupt:
+        say("\ninterrupted - safe to run again (loading is idempotent)")
+        return 1
+
+    say("\n==> Done")
+    if cfg.kibana_url:
+        say(f"  Dashboards: {cfg.kibana_url}{kibana_space_path(cfg.space)}/app/dashboards"
+            "   ->  \"Kismet Cartographer - Overview\" and \"... - Devices & Hardware\"")
+        say("  Set the time range to the dates you captured on.")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
