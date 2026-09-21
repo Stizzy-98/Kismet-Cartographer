@@ -10,6 +10,8 @@ devices were around you.
 * Your original `.kismet` files are never modified. Everything created in Elastic is named `kismet-cartographer-*`;
   nothing else in your cluster is touched.
 
+Be sure to check out the ADSB add-on to this project [Kismet ADSB to ELK](https://github.com/Stizzy-98/Kismet-ADSB-to-Elk) to visualize ADSB data in a baseball card format in a dashboard.
+
 > **Privacy and legality.** Captures contain your movements and other people's network names and device MAC addresses.
 > Only collect data you are allowed to collect, and keep the resulting indices restricted. See [docs/security.md](docs/security.md).
 
