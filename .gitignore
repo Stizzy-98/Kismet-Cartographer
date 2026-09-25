@@ -9,6 +9,7 @@
 # Capture data (real GPS/SSID data) and generated output. The wardrives/ folder itself is kept (see its README).
 wardrives/*
 !wardrives/README.md
+!wardrives/export_to_wigle.py
 *.kismet
 !tests/data/synthetic*.kismet
 out/

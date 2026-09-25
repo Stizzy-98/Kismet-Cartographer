@@ -116,6 +116,10 @@ Produces one WiGLE `WigleWifi-1.4` CSV from every capture in the directory (uplo
 <https://wigle.net/uploads>). No Elasticsearch is needed; the `.kismet` files are opened read-only and
 are never modified or deleted. The output folder `exports/` is git-ignored (real positions and SSIDs).
 
+For just the `wardrives/` folder with no arguments to remember, `./wardrives/export_to_wigle.py` does the
+same thing - it is `scripts/export_wigle.py` with the target and output path fixed to this one folder
+(`wardrives/wigle_export.csv`), reusing the same `kismet_cartographer.wigle` code, not a separate implementation.
+
 * **Rows**: one per access point (`type = "Wi-Fi AP"`) and per SSID it advertised, per capture file. The
   position, time, RSSI and altitude are those of the packet with the **strongest signal** that carries a real
   GPS fix (collector position - WiGLE estimates the AP location from this). Client devices are not exported.
